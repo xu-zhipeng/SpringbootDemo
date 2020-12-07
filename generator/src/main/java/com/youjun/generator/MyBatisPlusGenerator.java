@@ -23,6 +23,10 @@ import java.util.Scanner;
  */
 public class MyBatisPlusGenerator {
 
+    /**
+     * 使用方法：例：模块名输入：sys  表名输入：sys_*   将sys前缀的表都生成   注：模块名：sys只是生成的包名，与数据库无关
+     * @param args
+     */
     public static void main(String[] args) {
         String projectPath = System.getProperty("user.dir");
         String moduleName = scanner("模块名");
