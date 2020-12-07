@@ -24,7 +24,7 @@ logging:
     path: /var/logs
   level:
     root: info
-    com.macro.mall: info
+    com.youjun.api: info
 
 logstash:
   host: logstash

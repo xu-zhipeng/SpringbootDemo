@@ -16,7 +16,7 @@
     </resultMap>
 
     <select id="getMenuList" resultType="com.youjun.api.modules.ums.model.UmsMenu">
-        SELECT
+        SELECT distinct
             m.id id,
             m.parent_id parentId,
             m.create_time createTime,
@@ -34,11 +34,11 @@
         WHERE
             arr.admin_id = #{adminId}
           AND m.id IS NOT NULL
-        GROUP BY
-            m.id
+--         GROUP BY
+--             m.id
     </select>
     <select id="getMenuListByRoleId" resultType="com.youjun.api.modules.ums.model.UmsMenu">
-        SELECT
+        SELECT distinct
             m.id id,
             m.parent_id parentId,
             m.create_time createTime,
@@ -54,8 +54,8 @@
         WHERE
             rmr.role_id = #{roleId}
           AND m.id IS NOT NULL
-        GROUP BY
-            m.id
+--         GROUP BY
+--             m.id
     </select>
 
 </mapper>

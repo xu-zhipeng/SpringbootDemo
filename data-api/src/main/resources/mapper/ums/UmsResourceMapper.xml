@@ -13,10 +13,10 @@
     </resultMap>
 
     <select id="getResourceList" resultType="com.youjun.api.modules.ums.model.UmsResource">
-        SELECT
+        SELECT distinct
             ur.id id,
             ur.create_time createTime,
-            ur.`name` `name`,
+            ur.name name,
             ur.url url,
             ur.description description,
             ur.category_id categoryId
@@ -28,15 +28,15 @@
         WHERE
             ar.admin_id = #{adminId}
           AND ur.id IS NOT NULL
-        GROUP BY
-            ur.id
+--         GROUP BY
+--             ur.id
     </select>
 
     <select id="getResourceListByRoleId" resultType="com.youjun.api.modules.ums.model.UmsResource">
-        SELECT
+        SELECT distinct
             r.id id,
             r.create_time createTime,
-            r.`name` `name`,
+            r.name name,
             r.url url,
             r.description description,
             r.category_id categoryId
@@ -46,8 +46,8 @@
         WHERE
             rrr.role_id = #{roleId}
           AND r.id IS NOT NULL
-        GROUP BY
-            r.id
+--         GROUP BY
+--             r.id
     </select>
 
 </mapper>

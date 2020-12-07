@@ -1,8 +1,16 @@
 spring:
   datasource:
+    # mysql
     url: jdbc:mysql://hzhetundb-dev.mysql.rds.aliyuncs.com:3306/royal_canin?allowMultiQueries=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: hzhetun_dev_team
     password: HT86778673*!*
+    # mssql
+#    url: jdbc:sqlserver://47.102.153.227:1433;databaseName=Runtime
+#    username: sa
+#    password: Youjun#HZ2020
+#    url: jdbc:sqlserver://127.0.0.1:1433;databaseName=HistoryData
+#    username: sa
+#    password: 123456
     druid:
       initial-size: 10 #连接池初始化大小
       min-idle: 10 #最小空闲连接数
@@ -29,7 +37,7 @@ spring:
 logging:
   level:
     root: info
-    com.macro.mall: debug
+    com.youjun.api: debug
 
 logstash:
   host: localhost

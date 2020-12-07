@@ -49,6 +49,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector.version}</version>
         </dependency>
+        <!-- Mssql数据库驱动 -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>6.4.0.jre8</version>
+        </dependency>
         <!--SpringBoot配置处理-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
