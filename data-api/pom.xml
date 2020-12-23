@@ -55,12 +55,6 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>6.4.0.jre8</version>
         </dependency>
-        <!--SpringBoot配置处理-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
         <!--MyBatis Plus 依赖-->
         <dependency>
             <groupId>com.baomidou</groupId>

@@ -32,10 +32,6 @@
             <artifactId>jjwt</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.youjun</groupId>
-            <artifactId>common</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
