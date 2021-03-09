@@ -1,7 +1,6 @@
 package com.youjun.common.api;
 
 import cn.hutool.core.convert.Convert;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
 
@@ -19,8 +18,9 @@ public class CommonPage<T> {
     /**
      * 将MyBatis Plus 分页结果转化为通用结果
      */
-    public static <T> CommonPage<T> restPage(Page<T> pageResult) {
+    public static <T> CommonPage<T> restPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<T> pageResult) {
         CommonPage<T> result = new CommonPage<>();
+        //默认页码从1开始
         result.setPageNum(Convert.toInt(pageResult.getCurrent()));
         result.setPageSize(Convert.toInt(pageResult.getSize()));
         result.setTotal(pageResult.getTotal());
@@ -28,6 +28,20 @@ public class CommonPage<T> {
         result.setList(pageResult.getRecords());
         return result;
     }
+    /**
+     * 将data jpa 分页结果转化为通用结果
+     */
+    public static <T> CommonPage<T> restPage(org.springframework.data.domain.Page<T> pageResult) {
+        CommonPage<T> result = new CommonPage<>();
+        //默认页码从0开始
+        result.setPageNum(Convert.toInt(pageResult.getNumber()+1));
+        result.setPageSize(Convert.toInt(pageResult.getSize()));
+        result.setTotal(pageResult.getTotalElements());
+        result.setTotalPage(Convert.toInt(pageResult.getTotalElements()/pageResult.getSize()+1));
+        result.setList(pageResult.getContent());
+        return result;
+    }
+
 
     public Integer getPageNum() {
         return pageNum;

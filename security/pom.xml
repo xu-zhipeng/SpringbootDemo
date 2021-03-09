@@ -11,7 +11,7 @@
 
     <parent>
         <groupId>com.youjun</groupId>
-        <artifactId>royal-canin</artifactId>
+        <artifactId>spring-boot-demo</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 

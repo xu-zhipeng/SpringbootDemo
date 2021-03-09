@@ -20,8 +20,9 @@ spring:
     timeout: 300ms # 连接超时时间（毫秒）
 
 logging:
-  file:
-    path: /var/logs
+  config: classpath:logback-spring-prod.xml
+#  file:
+#    path: /var/logs
   level:
     root: info
     com.youjun.api: info

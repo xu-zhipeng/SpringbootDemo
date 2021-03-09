@@ -1,6 +1,6 @@
 spring:
   application:
-    name: royal-canin
+    name: spring-boot-demo
   profiles:
     active: dev #默认为开发环境
   servlet:
@@ -24,12 +24,12 @@ mybatis-plus:
 
 jwt:
   tokenHeader: Authorization #JWT存储的请求头
-  secret: royal-canin-secret #JWT加解密使用的密钥
+  secret: spring-boot-demo-secret #JWT加解密使用的密钥
   expiration: 604800 #JWT的超期限时间(60*60*24*7)
   tokenHead: 'Bearer '  #JWT负载中拿到开头
 
 redis:
-  database: royal-canin
+  database: spring-boot-demo
   key:
     admin: 'ums:admin'
     resourceList: 'ums:resourceList'

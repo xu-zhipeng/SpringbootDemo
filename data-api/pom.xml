@@ -11,7 +11,7 @@
 
     <parent>
         <groupId>com.youjun</groupId>
-        <artifactId>royal-canin</artifactId>
+        <artifactId>spring-boot-demo</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>6.4.0.jre8</version>
+            <version>${sqlserver-connector.version}</version>
         </dependency>
         <!--MyBatis Plus 依赖-->
         <dependency>
@@ -66,6 +66,12 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>${velocity.version}</version>
+        </dependency>
+        <!-- gson依赖 -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
         </dependency>
     </dependencies>
 

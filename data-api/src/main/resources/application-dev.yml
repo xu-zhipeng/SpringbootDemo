@@ -23,7 +23,7 @@ spring:
 
   influx:
     url: http://localhost:8086
-    database: royal-canin
+    database: spring-boot-demo
     user: admin
     password: admin
 
@@ -35,6 +35,7 @@ spring:
     timeout: 300ms # 连接超时时间（毫秒）
 
 logging:
+  config: classpath:logback-spring-dev.xml
   level:
     root: info
     com.youjun.api: debug
