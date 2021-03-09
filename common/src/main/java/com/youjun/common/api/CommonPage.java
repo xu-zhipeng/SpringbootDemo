@@ -21,23 +21,24 @@ public class CommonPage<T> {
     public static <T> CommonPage<T> restPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<T> pageResult) {
         CommonPage<T> result = new CommonPage<>();
         //默认页码从1开始
-        result.setPageNum(Convert.toInt(pageResult.getCurrent()));
-        result.setPageSize(Convert.toInt(pageResult.getSize()));
+        result.setPageNum((int) pageResult.getCurrent());
+        result.setPageSize((int) pageResult.getSize());
         result.setTotal(pageResult.getTotal());
-        result.setTotalPage(Convert.toInt(pageResult.getTotal()/pageResult.getSize()+1));
+        result.setTotalPage((int) (pageResult.getTotal() / pageResult.getSize() + 1));
         result.setList(pageResult.getRecords());
         return result;
     }
+
     /**
      * 将data jpa 分页结果转化为通用结果
      */
     public static <T> CommonPage<T> restPage(org.springframework.data.domain.Page<T> pageResult) {
         CommonPage<T> result = new CommonPage<>();
         //默认页码从0开始
-        result.setPageNum(Convert.toInt(pageResult.getNumber()+1));
-        result.setPageSize(Convert.toInt(pageResult.getSize()));
+        result.setPageNum(pageResult.getNumber() + 1);
+        result.setPageSize(pageResult.getSize());
         result.setTotal(pageResult.getTotalElements());
-        result.setTotalPage(Convert.toInt(pageResult.getTotalElements()/pageResult.getSize()+1));
+        result.setTotalPage((int) (pageResult.getTotalElements() / pageResult.getSize() + 1));
         result.setList(pageResult.getContent());
         return result;
     }
