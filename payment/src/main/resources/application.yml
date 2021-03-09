@@ -1,0 +1,32 @@
+logging:
+  level:
+    org.springframework.web: info
+    #微信支付
+    com.youjun.payment.wxpay: debug
+    com.github.binarywang.wxpay: debug
+
+
+wx:
+  #微信支付
+  pay:
+    appId: #微信公众号或者小程序等的appid
+    mchId: #微信支付商户号
+    mchKey: #微信支付商户密钥
+    subAppId: #服务商模式下的子商户公众账号ID
+    subMchId: #服务商模式下的子商户号
+    keyPath: # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+
+# 沙箱账号
+pay:
+  #支付宝支付
+  alipay:
+    id: 1
+    gatewayUrl: https://openapi.alipay.com/gateway.do
+    appid: 2021001180621211
+    privateKey: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCC5dXE3g+aeu5kN0NnN4m/7+VR8wHBo0eKOutkdemZEYkExgBdnBdMeJ9vEgYUDVpSDi4J+ca1HjU9tZ+4jeOYQcXou3Ak2CIvlEGM6d1BbDiFcL8zNMfmH8eNNX3JQjTwTIAhMjv4HwKeayDTCh4uYqsV7/+8hB7B2vfS8DHdnfhLfsOEoLnNr0Tffl2iJJ1vYZtWQLlNZXIkM2aRyo6q28JAwqA91Xd72hoNZqwcH/kcgayVf8sQTuRJM673GAhH4v8ibCMQDLM4vpZmj7aqyLznVDIgOkyujJ0bJZSZ0+outXd7+oYXplvtEHZJUO1gExmRWWSVE5ZH4xvRV1d9AgMBAAECggEAXzU0y0CJMN+BTbs0d3rZ4pVmwrhx6poMiupYFHX/Nqqecq5hzbSe7aw+qtb9PNCJhW1y5yaZ9VrHdt8IEYCCrlgIz0KmSuY510mKdCgWGmPQqJ5dM62MSEGNL5RcrWpOfwnlmD+lhs9nZDqfYWDWmv6BWi96X2/pvy65WuACJSKZ2iMJxlxOV3igCtvp6H3RTwh2vb4O7jtco1HDGasuj2eIeH9IDNA1QIKKBa46adkowJlpFsJJKx85L13HOGZZpYFagrcmlSzcb0YJoAlpmjGbYY0uHBCQJYgixNnlQMI6hMZqXysKBArLqzp4T1ZqFhLru9iSCfEkYU8ZYfoZgQKBgQDJVf8ogL9uAUTmotevyyt4oJXsBs9BuOqDecf83ZXlShxVylNlbNRpdaOnjGrtuJeh2g52lsOb5q3cFvunDhH7hBzkqXZbDCcEEemUDw7b3AgOM6SwtgtXvTExGElGAk9O3cMazhGGmI8t+w1cPxfL6n0BR30eHv4yfRnM+e7r5QKBgQCmb/vK/40PzPrFrNRz8Zy9iibCM9stDsOyln4yU5xahoBwesZxgkWBrdZS1pvkEVLWQE/MthYsIEhEX+UeSF+Y096BvFcF4aLz5KIMmVm/sxaUhRwZMwZl1ytNAelr0IMmWj5OIKiyQJ3k5V6H/wQ2jUwD+Sa4sEhPm4Hou2tzuQKBgA4cMcqz4zahbiO/y9/tHDnS/07QV1wiyoS2Vza4jNXJ8NxuVpPoIabWcMbAR4orgqz8LEFRZZoae5rOHYriqI34/1FjMwFEg8N8QeN3frIX5JSiN+uOhpL6lmT7b78xUD+VuSO6x22oaXhufMw3O8K1x1b8nJ8syuHc9J7x8TWlAoGBAJbUPuu84RnjmZKQSEv2NiPyUaOGmOZhTenGxgBXkwbagwTrznBJLTIS1nplsApjxJ0S1P5gOQGuE6+a86iYz8FQp4EMrBRRYXoCxPQD+Lhn1FutsUQI4JBkCQKVa/JfmKql93aX1CkNs8keL6ew7CF/tNaY8IVIg49ZDsZZKkxJAoGAOKiZ0nMxurvsVR+Uah/n93UJav0i3x+rV9C3t5ZAdMmYNYmNydYuzS3U/nae1u2kUaoI2hv93XYS1paWVaKvUYD+qeSXAeSDY8sXxIiwulfdNhktkvAtSQ7tKEgqY/+ocUAiBbLSkUR2vp8KSAlGlImNatxJ8VQHml+nYJqqraM=
+    publicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmZ9uXz/Me6R/xH5aruwE6lvuiPb/Dqm4fxVdU3Pa8c5e7RmMfHcX5c0bl/JrVudId+nB1AqGwCaMDvzUYOhq/snddHbyX9G6QcXF7yhgtSV5wALZHHPhaxFe4GIxG8/w2sq09deDxb4aQFk6QcTsAYLtkoFL2yiPp66YEvKcCEx8/KhP5cHVG8gYWQCqk5hxBJ2QKb4bHHuxhucUIaRNJAEx4/AHxKEvsqSkwmLEaxQ0kokgTzVzHlyDPRFIQB9GoWiv9MdFYy3OV6hUqjaKSvHzyOZ028WBEiIhvefJFi912yyWHSowMz5VbukHmaN89yco9eeAajrx75VDVEpfQQIDAQAB
+    returnUrl: http://s9v2cw.natappfree.cc/alipay/return
+    notifyUrl: http://39.100.38.142:8083/alipay/notify
+    signType: RSA2
+    formate: json
+    charset: UTF-8

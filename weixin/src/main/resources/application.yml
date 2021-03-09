@@ -1,0 +1,35 @@
+logging:
+  level:
+    org.springframework.web: info
+    #微信小程序支付
+    com.youjun.payment.wx.miniapp: debug
+    cn.binarywang.wx.miniapp: debug
+    #微信公众号
+    com.youjun.wx.mp: DEBUG
+    me.chanjar.weixin: DEBUG
+
+
+wx:
+  #微信小程序
+  miniapp:
+    configs:
+      - appid: #微信小程序的appid
+        secret: #微信小程序的Secret
+        token: #微信小程序消息服务器配置的token
+        aesKey: #微信小程序消息服务器配置的EncodingAESKey
+        msgDataFormat: JSON
+  #微信公众号
+  mp:
+    useRedis: false
+    redisConfig:
+      host: 127.0.0.1
+      port: 6379
+    configs:
+      - appId: 1111 # 第一个公众号的appid
+        secret: 1111 # 公众号的appsecret
+        token: 111 # 接口配置里的Token值
+        aesKey: 111 # 接口配置里的EncodingAESKey值
+      - appId: 2222 # 第二个公众号的appid，以下同上
+        secret: 1111
+        token: 111
+        aesKey: 111
