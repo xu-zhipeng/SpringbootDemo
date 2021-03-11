@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
@@ -47,6 +48,26 @@ public class TestController {
     @ApiOperation(value = "测试localDateTime")
     @RequestMapping("/saveTime")
     public UserDate saveTime(@RequestBody UserDate userDate){
+        return userDate;
+    }
+
+
+    @ApiOperation(value = "测试localDateTime")
+    @RequestMapping("/saveTime1")
+    public UserDate saveTime1(@RequestParam(value = "id")int id,
+                             @RequestParam(value = "dateString")String dateString,
+                             @RequestParam(value = "time1",required = false)LocalDateTime time1,
+                             @RequestParam(value = "time2",required = false)LocalDateTime time2,
+                             @RequestParam(value = "time3",required = false)Date time3,
+                             @RequestParam(value = "time4",required = false)Date time4){
+
+        UserDate userDate = new UserDate();
+        userDate.setId(id);
+        userDate.setDateString(dateString);
+        userDate.setTime1(time1);
+        userDate.setTime2(time2);
+        userDate.setTime3(time3);
+        userDate.setTime4(time4);
         return userDate;
     }
 }
