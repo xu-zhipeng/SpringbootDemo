@@ -6,9 +6,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
 import javax.jws.soap.SOAPBinding;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -37,6 +39,8 @@ public class TestController {
         userDate.setDateString("2021-03-09 15:18:25");
         userDate.setTime1(LocalDateTime.now());
         userDate.setTime2(LocalDateTime.now());
+        userDate.setTime3(new Date());
+        userDate.setTime4(new Date());
         return userDate;
     }
 
