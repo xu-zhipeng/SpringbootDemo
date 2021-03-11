@@ -1,9 +1,14 @@
 package com.youjun.api.modules.test;
 
+import com.youjun.api.modules.test.model.UserDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.jws.soap.SOAPBinding;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -22,5 +27,22 @@ public class TestController {
     @RequestMapping("/test")
     public String test(){
         return "hell test";
+    }
+
+    @ApiOperation(value = "测试localDateTime")
+    @RequestMapping("/localDateTime")
+    public UserDate localDateTime(){
+        UserDate userDate = new UserDate();
+        userDate.setId(0);
+        userDate.setDateString("2021-03-09 15:18:25");
+        userDate.setTime1(LocalDateTime.now());
+        userDate.setTime2(LocalDateTime.now());
+        return userDate;
+    }
+
+    @ApiOperation(value = "测试localDateTime")
+    @RequestMapping("/saveTime")
+    public UserDate saveTime(@RequestBody UserDate userDate){
+        return userDate;
     }
 }
