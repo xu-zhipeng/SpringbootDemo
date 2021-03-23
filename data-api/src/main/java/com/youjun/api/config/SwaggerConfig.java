@@ -17,8 +17,8 @@ public class SwaggerConfig extends BaseSwaggerConfig {
     public SwaggerProperties swaggerProperties() {
         return SwaggerProperties.builder()
                 .apiBasePackage("com.youjun.api.modules")
-                .title("royal-canin项目")
-                .description("royal-canin项目相关接口文档")
+                .title("spring-boot-demo项目")
+                .description("spring-boot-demo项目相关接口文档")
                 .contactName("kirk")
                 .version("1.0")
                 .enableSecurity(true)
