@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyun.sanyuan.model.bussiness.mapper.litigationSource.BussinessLitigationSourceBasicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.youjun.api.modules.office.model.BussinessLitigationSourceBasicEntity">
+        <id column="uuid" property="uuid" />
+        <result column="mediation_committee" property="mediationCommittee" />
+        <result column="acceptor" property="acceptor" />
+        <result column="mediation_studio" property="mediationStudio" />
+        <result column="case_code" property="caseCode" />
+        <result column="source_channel" property="sourceChannel" />
+        <result column="co_organizing_commission" property="coOrganizingCommission" />
+        <result column="acceptance_time" property="acceptanceTime" />
+        <result column="source_of_case" property="sourceOfCase" />
+        <result column="case_difficulty_level" property="caseDifficultyLevel" />
+        <result column="type_of_dispute" property="typeOfDispute" />
+        <result column="administrative_division" property="administrativeDivision" />
+        <result column="place_of_dispute" property="placeOfDispute" />
+        <result column="party" property="party" />
+        <result column="the_nature_of_the_case" property="theNatureOfTheCase" />
+        <result column="cases_involving_special_groups" property="casesInvolvingSpecialGroups" />
+        <result column="brief_information" property="briefInformation" />
+        <result column="death_or_not" property="deathOrNot" />
+        <result column="application_for_withdrawal" property="applicationForWithdrawal" />
+        <result column="case_prediction" property="casePrediction" />
+        <result column="application_amount" property="applicationAmount" />
+        <result column="mediation_time" property="mediationTime" />
+        <result column="mediation_no" property="mediationNo" />
+        <result column="mode_of_performance" property="modeOfPerformance" />
+        <result column="mediation_results" property="mediationResults" />
+        <result column="mediation_agreement_fee" property="mediationAgreementFee" />
+        <result column="agreement_performance" property="agreementPerformance" />
+        <result column="dispute_transformation" property="disputeTransformation" />
+        <result column="remarks" property="remarks" />
+        <result column="host_mediator" property="hostMediator" />
+        <result column="co_mediator" property="coMediator" />
+    </resultMap>
+
+</mapper>
