@@ -56,6 +56,7 @@ secure:
       - /admin/logout
       - /minio/upload
       - /Test/**
+      - /office/**  #office测试
 
 aliyun:
   oss:

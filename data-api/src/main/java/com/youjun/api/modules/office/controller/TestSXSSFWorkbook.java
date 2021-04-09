@@ -47,7 +47,7 @@ public class TestSXSSFWorkbook {
             }
             OutputStream outputStream = null;
             // 打开目的输入流，不存在则会创建
-            outputStream = new FileOutputStream("J:\\out.xlsx");
+            outputStream = new FileOutputStream("D:\\out.xlsx");
             workbook.write(outputStream);
             outputStream.close();
             long t2 = System.currentTimeMillis();
@@ -73,7 +73,7 @@ public class TestSXSSFWorkbook {
             }
             OutputStream outputStream = null;
             // 打开目的输入流，不存在则会创建
-            outputStream = new FileOutputStream("J:\\out2.xlsx");
+            outputStream = new FileOutputStream("D:\\out2.xlsx");
             workbook.write(outputStream);
             outputStream.close();
             long t2 = System.currentTimeMillis();

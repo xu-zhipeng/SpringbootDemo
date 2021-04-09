@@ -21,7 +21,7 @@ import java.util.List;
 public interface SystemExcelTemplateService extends IService<SystemExcelTemplateEntity> {
     List<SystemExcelTemplateEntity> findTemplateBytemplateName(String templateName);
 
-    <E> List<E> readExcel(MultipartFile file, String templateName, Class<E> cls) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, IOException;
+    <E> List<E> readExcel(MultipartFile file, String templateName, Class<E> cls) throws IllegalAccessException, InstantiationException, IOException;
 
     <E> void writeExcel(List<E> list, String templateName, Class<E> cls,HttpServletResponse response) throws IllegalAccessException, IOException;
 

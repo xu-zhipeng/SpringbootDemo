@@ -1,22 +1,28 @@
 package com.youjun.api.modules.office.controller;
 
+import cn.hutool.core.util.XmlUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.google.gson.Gson;
 import com.youjun.api.modules.office.model.BussinessLitigationSourceBasicEntity;
 import com.youjun.common.api.CommonResult;
+import io.swagger.annotations.ApiOperation;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDocument1;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -28,15 +34,188 @@ import java.util.*;
  * @since 2021/4/7
  */
 @RestController
-@RequestMapping("/office/test")
+@RequestMapping("/office")
 public class OfficeController {
+
+    @ApiOperation("生成word报告")
+    @GetMapping("/exportWord2003")
+    public CommonResult exportWord2003() throws IOException {
+        String telephone="□";
+        String faceToFace="□";
+        String other_feedback="□";
+        String satisfied="□";
+        String basicUnderstanding="□";
+        String dissatisfied="□";
+        String other_satisfaction="□";
+        Integer handleOpinion=1;
+        switch (handleOpinion){
+            case 1:
+                telephone="√";
+                break;
+            case 2:
+                faceToFace="√";
+                break;
+            case 3:
+                other_feedback="√";
+                break;
+            default:
+        }
+        Integer serverOpinion=1;
+        switch (serverOpinion){
+            case 1:
+                satisfied="√";
+                break;
+            case 2:
+                basicUnderstanding="√";
+                break;
+            case 3:
+                dissatisfied="√";
+                break;
+            case 4:
+                other_satisfaction="√";
+            default:
+        }
+        FileInputStream inputStream = new FileInputStream("D:\\template\\信访代办导出模板.doc");
+        HWPFDocument document = new HWPFDocument(inputStream);
+        Range range = document.getRange();
+        range.replaceText("${letterNumber}", "20210409");
+        range.replaceText("${eventDate}", "2021-04-09");
+        range.replaceText("${contactName}", "林泽");
+        range.replaceText("${reflectionPersonNum}", "1");
+        range.replaceText("${reflectionAddr}", "杭州市余杭区仓前街道");
+        range.replaceText("${reflectionTel}", "18787234000");
+        range.replaceText("${eventContent}", "反映内容及诉求1111111111111111");
+        range.replaceText("${reflectionPerson}", "许志鹏");
+        range.replaceText("${contactPhone}", "18700234000");
+        range.replaceText("${deptName}", "街道党建办");
+        range.replaceText("${leaderOpinion}", "办理结果11111");
+        range.replaceText("${dueDate}", "2021-04-09");
+        range.replaceText("${telephone}", telephone);
+        range.replaceText("${faceToFace}", faceToFace);
+        range.replaceText("${other_feedback}", other_feedback);
+        range.replaceText("${satisfied}", satisfied);
+        range.replaceText("${basicUnderstanding}", basicUnderstanding);
+        range.replaceText("${dissatisfied}", dissatisfied);
+        range.replaceText("${other_satisfaction}", other_satisfaction);
+        /*//创建文档
+        XWPFDocument document = new XWPFDocument();
+        //段落XWPFParagraph
+        XWPFParagraph paragraph;
+        //基本元素XWPFRun
+        XWPFRun run;
+        //表格XWPFTable
+        XWPFTable table;
+        //创建 新段落
+        paragraph = document.createParagraph();
+        // 设置段落格式
+        // 对齐方式
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+        // 边框
+        paragraph.setBorderBottom(Borders.DOUBLE);
+        paragraph.setBorderTop(Borders.DOUBLE);
+        paragraph.setBorderRight(Borders.DOUBLE);
+        paragraph.setBorderLeft(Borders.DOUBLE);
+        paragraph.setBorderBetween(Borders.SINGLE);
+        // 段落末尾创建XWPFRun
+        run = paragraph.createRun();
+        run.setText("为这个段落追加文本");
+        //创建新表格
+        table = doc.createTable(10, 4);
+        table.getRow(1).getCell(1).setText("代办编号");*/
+        //写入文档
+        try (FileOutputStream outputStream = new FileOutputStream("D:\\out.docx")) {
+            document.write(outputStream);
+        }
+        return CommonResult.success(null);
+    }
+
+    @ApiOperation("生成word报告")
+    @GetMapping("/exportWord2007")
+    public CommonResult exportWord2007() throws IOException {
+        String telephone="□";
+        String faceToFace="□";
+        String other_feedback="□";
+        String satisfied="□";
+        String basicUnderstanding="□";
+        String dissatisfied="□";
+        String other_satisfaction="□";
+        Integer handleOpinion=1;
+        switch (handleOpinion){
+            case 1:
+                telephone="√";
+                break;
+            case 2:
+                faceToFace="√";
+                break;
+            case 3:
+                other_feedback="√";
+                break;
+            default:
+        }
+        Integer serverOpinion=1;
+        switch (serverOpinion){
+            case 1:
+                satisfied="√";
+                break;
+            case 2:
+                basicUnderstanding="√";
+                break;
+            case 3:
+                dissatisfied="√";
+                break;
+            case 4:
+                other_satisfaction="√";
+            default:
+        }
+        FileInputStream inputStream = new FileInputStream("D:\\template\\信访代办导出模板.docx");
+        XWPFDocument document = new XWPFDocument(inputStream);
+        /*//创建文档
+        XWPFDocument document = new XWPFDocument();
+        //段落XWPFParagraph
+        XWPFParagraph paragraph;
+        //基本元素XWPFRun
+        XWPFRun run;
+        //表格XWPFTable
+        XWPFTable table;
+        //创建 新段落
+        paragraph = document.createParagraph();
+        // 设置段落格式
+        // 对齐方式
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+        // 边框
+        paragraph.setBorderBottom(Borders.DOUBLE);
+        paragraph.setBorderTop(Borders.DOUBLE);
+        paragraph.setBorderRight(Borders.DOUBLE);
+        paragraph.setBorderLeft(Borders.DOUBLE);
+        paragraph.setBorderBetween(Borders.SINGLE);
+        // 段落末尾创建XWPFRun
+        run = paragraph.createRun();
+        run.setText("为这个段落追加文本");
+        //创建新表格
+        table = doc.createTable(10, 4);
+        table.getRow(1).getCell(1).setText("代办编号");*/
+        //写入文档
+        try (FileOutputStream outputStream = new FileOutputStream("D:\\out.docx")) {
+            document.write(outputStream);
+        }
+        return CommonResult.success(null);
+    }
 
     @RequestMapping("readWordXML")
     public CommonResult readWordXML() {
         try {
             //加载文档
-            InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）.xml");
-            HWPFDocument doc = new HWPFDocument(inputStream);
+            InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）.doc");
+//            InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）.xml");
+//            Document document = XmlUtil.readXML(inputStream);
+//            XWPFDocument doc = new XWPFDocument(inputStream);
+//            HWPFDocument doc = new HWPFDocument(inputStream);
+//            WordExtractor doc = new WordExtractor(inputStream);
+            //读取xml文件
+            HSSFWorkbook work = new HSSFWorkbook(inputStream);
+            //获取xml的表
+//            HSSFSheet sheet = work.getSheet("sheet1");
+            System.out.println("结束");
         } catch (Exception e) {
             e.printStackTrace();
         }

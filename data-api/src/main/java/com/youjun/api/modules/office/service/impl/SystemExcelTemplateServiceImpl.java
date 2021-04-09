@@ -3,6 +3,7 @@ package com.youjun.api.modules.office.service.impl;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.cell.FormulaCellValue;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.youjun.api.modules.office.mapper.SystemExcelTemplateMapper;
@@ -10,9 +11,7 @@ import com.youjun.api.modules.office.model.SystemEnumEntity;
 import com.youjun.api.modules.office.model.SystemExcelTemplateEntity;
 import com.youjun.api.modules.office.service.SystemEnumService;
 import com.youjun.api.modules.office.service.SystemExcelTemplateService;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -29,12 +28,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
 
 /**
  * <p>
@@ -59,7 +58,7 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
     }
 
     @Override
-    public <E> List<E> readExcel(MultipartFile file, String templateName, Class<E> cls) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, IOException {
+    public <E> List<E> readExcel(MultipartFile file, String templateName, Class<E> cls) throws IllegalAccessException, InstantiationException, IOException {
         // 2.应用HUtool ExcelUtil获取ExcelReader指定输入流和sheet
         ExcelReader excelReader = ExcelUtil.getReader(file.getInputStream(), 0);
         //获取模板
@@ -175,7 +174,7 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
                         }
                     }
                     // 判断是否枚举，修改value值
-                    if (templateField.getEnumType() != null && templateField.getEnumType() == 1) {
+                    if (value != null && templateField.getEnumType() != null && templateField.getEnumType() == 1) {
                         List<SystemEnumEntity> enumList = enumService.findByType(templateField.getFieldName());
                         boolean isFund = false;
                         for (SystemEnumEntity systemEnum : enumList) {
@@ -187,8 +186,8 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
                         }
                         //未查到枚举新增
                         if (!isFund) {
-                            log.error("Enum value not fund");
-                            throw new RuntimeException("Enum value not fund");
+                            log.error(templateField.getFieldName() + " enum value not fund");
+                            throw new RuntimeException(templateField.getFieldName() + " enum value not fund");
                         }
                     }
                     //填入
@@ -202,7 +201,7 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
         BigExcelWriter writer = (BigExcelWriter) ExcelUtil.getBigWriter();
         // 合并单元格后的标题行，使用默认标题样式
         String title = templateList.get(0).getDescription();
-        writer.merge(row.size() - 1, title);
+        writer.merge(templateList.size() - 1, title);
         // 一次性写出内容，使用默认样式，强制输出标题
         writer.write(rows, true);
         //response为HttpServletResponse对象
@@ -277,7 +276,7 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
                         }
                     }
                     // 判断是否枚举，修改value值
-                    if (templateField.getEnumType() != null && templateField.getEnumType() == 1) {
+                    if (value != null && templateField.getEnumType() != null && templateField.getEnumType() == 1) {
                         List<SystemEnumEntity> enumList = enumService.findByType(templateField.getFieldName());
                         boolean isFund = false;
                         for (SystemEnumEntity systemEnum : enumList) {
@@ -289,12 +288,13 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
                         }
                         //未查到枚举新增
                         if (!isFund) {
-                            log.error("Enum value not fund");
-                            throw new RuntimeException("Enum value not fund");
+                            log.error(templateField.getFieldName() + " enum value not fund");
+                            throw new RuntimeException(templateField.getFieldName() + " enum value not fund");
                         }
                     }
                     //填入
-                    row.createCell(templateField.getFieldColumnIndex() - 1).setCellValue(value == null ? "" : value.toString());
+                    this.setCellValue(row.createCell(templateField.getFieldColumnIndex() - 1),value,(CellStyle)null);
+//                    row.createCell(templateField.getFieldColumnIndex() - 1).setCellValue(value == null ? "" : value.toString());
                 }
                 count++;
             }
@@ -310,5 +310,40 @@ public class SystemExcelTemplateServiceImpl extends ServiceImpl<SystemExcelTempl
         workbook.write(out);
         //此处记得关闭输出Servlet流
         out.close();
+    }
+
+    private void setCellValue(Cell cell, Object value, CellStyle style) {
+        if (null != cell) {
+            if (null != style) {
+                cell.setCellStyle(style);
+            }
+
+            if (null == value) {
+                cell.setCellValue("");
+            } else if (value instanceof FormulaCellValue) {
+                cell.setCellFormula(((FormulaCellValue)value).getValue());
+            } else if (value instanceof Date) {
+                cell.setCellValue((Date)value);
+            } else if (value instanceof TemporalAccessor) {
+                if (value instanceof Instant) {
+                    cell.setCellValue(Date.from((Instant)value));
+                } else if (value instanceof LocalDateTime) {
+                    cell.setCellValue((LocalDateTime)value);
+                } else if (value instanceof LocalDate) {
+                    cell.setCellValue((LocalDate)value);
+                }
+            } else if (value instanceof Calendar) {
+                cell.setCellValue((Calendar)value);
+            } else if (value instanceof Boolean) {
+                cell.setCellValue((Boolean)value);
+            } else if (value instanceof RichTextString) {
+                cell.setCellValue((RichTextString)value);
+            } else if (value instanceof Number) {
+                cell.setCellValue(((Number)value).doubleValue());
+            } else {
+                cell.setCellValue(value.toString());
+            }
+
+        }
     }
 }
