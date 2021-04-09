@@ -3,10 +3,12 @@ package com.youjun.api.modules.office.controller;
 import cn.hutool.core.util.XmlUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.google.gson.Gson;
 import com.youjun.api.modules.office.model.BussinessLitigationSourceBasicEntity;
 import com.youjun.common.api.CommonResult;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hwpf.HWPFDocument;
@@ -24,6 +26,7 @@ import org.w3c.dom.Document;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -33,6 +36,7 @@ import java.util.*;
  * @author kirk
  * @since 2021/4/7
  */
+@Slf4j
 @RestController
 @RequestMapping("/office")
 public class OfficeController {
@@ -40,39 +44,39 @@ public class OfficeController {
     @ApiOperation("生成word报告")
     @GetMapping("/exportWord2003")
     public CommonResult exportWord2003() throws IOException {
-        String telephone="□";
-        String faceToFace="□";
-        String other_feedback="□";
-        String satisfied="□";
-        String basicUnderstanding="□";
-        String dissatisfied="□";
-        String other_satisfaction="□";
-        Integer handleOpinion=1;
-        switch (handleOpinion){
+        String telephone = "□";
+        String faceToFace = "□";
+        String other_feedback = "□";
+        String satisfied = "□";
+        String basicUnderstanding = "□";
+        String dissatisfied = "□";
+        String other_satisfaction = "□";
+        Integer handleOpinion = 1;
+        switch (handleOpinion) {
             case 1:
-                telephone="√";
+                telephone = "√";
                 break;
             case 2:
-                faceToFace="√";
+                faceToFace = "√";
                 break;
             case 3:
-                other_feedback="√";
+                other_feedback = "√";
                 break;
             default:
         }
-        Integer serverOpinion=1;
-        switch (serverOpinion){
+        Integer serverOpinion = 1;
+        switch (serverOpinion) {
             case 1:
-                satisfied="√";
+                satisfied = "√";
                 break;
             case 2:
-                basicUnderstanding="√";
+                basicUnderstanding = "√";
                 break;
             case 3:
-                dissatisfied="√";
+                dissatisfied = "√";
                 break;
             case 4:
-                other_satisfaction="√";
+                other_satisfaction = "√";
             default:
         }
         FileInputStream inputStream = new FileInputStream("D:\\template\\信访代办导出模板.doc");
@@ -132,39 +136,39 @@ public class OfficeController {
     @ApiOperation("生成word报告")
     @GetMapping("/exportWord2007")
     public CommonResult exportWord2007() throws IOException {
-        String telephone="□";
-        String faceToFace="□";
-        String other_feedback="□";
-        String satisfied="□";
-        String basicUnderstanding="□";
-        String dissatisfied="□";
-        String other_satisfaction="□";
-        Integer handleOpinion=1;
-        switch (handleOpinion){
+        String telephone = "□";
+        String faceToFace = "□";
+        String other_feedback = "□";
+        String satisfied = "□";
+        String basicUnderstanding = "□";
+        String dissatisfied = "□";
+        String other_satisfaction = "□";
+        Integer handleOpinion = 1;
+        switch (handleOpinion) {
             case 1:
-                telephone="√";
+                telephone = "√";
                 break;
             case 2:
-                faceToFace="√";
+                faceToFace = "√";
                 break;
             case 3:
-                other_feedback="√";
+                other_feedback = "√";
                 break;
             default:
         }
-        Integer serverOpinion=1;
-        switch (serverOpinion){
+        Integer serverOpinion = 1;
+        switch (serverOpinion) {
             case 1:
-                satisfied="√";
+                satisfied = "√";
                 break;
             case 2:
-                basicUnderstanding="√";
+                basicUnderstanding = "√";
                 break;
             case 3:
-                dissatisfied="√";
+                dissatisfied = "√";
                 break;
             case 4:
-                other_satisfaction="√";
+                other_satisfaction = "√";
             default:
         }
         FileInputStream inputStream = new FileInputStream("D:\\template\\信访代办导出模板.docx");
@@ -236,6 +240,48 @@ public class OfficeController {
 
     @RequestMapping("readWord2007")
     public CommonResult readWord2007() {
+        int i, j, k;
+        try {
+            //加载文档
+            InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）-2007.docx");
+            XWPFDocument doc = new XWPFDocument(inputStream);
+            // 段落
+            List<XWPFParagraph> paragraphs = doc.getParagraphs();
+            i=0;
+            for (XWPFParagraph paragraph : paragraphs) {
+                System.out.println("第"+(i++)+"个段落：" + paragraph.getText());
+            }
+            // 表格
+            List<XWPFTable> tables = doc.getTables();
+             i = 0;
+            for (XWPFTable table : tables) {
+                System.out.println("第" + (i++) + "个表格");
+                 j = 0;
+                for (XWPFTableRow row : table.getRows()) {
+                    System.out.println("        第" + (j++) + "行");
+                     k = 0;
+                    for (XWPFTableCell cell : row.getTableCells()) {
+                        String value = cell.getParagraphs().stream().map(XWPFParagraph::getText).collect(Collectors.joining());
+                        System.out.println("            第" + (k++) + "列:" + value);
+
+                    }
+                }
+            }
+            // 图片
+            List<XWPFPictureData> allPictures = doc.getAllPictures();
+            // 页眉
+            List<XWPFHeader> headerList = doc.getHeaderList();
+            // 页脚
+            List<XWPFFooter> footerList = doc.getFooterList();
+            System.out.println();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return CommonResult.success(null);
+    }
+
+    @RequestMapping("readWord20071")
+    public CommonResult readWord20071() {
         try {
             //加载文档
             InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）-2007.docx");
