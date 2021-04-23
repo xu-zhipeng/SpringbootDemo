@@ -3,27 +3,40 @@ package com.youjun.api.modules.office.controller;
 import cn.hutool.core.util.XmlUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
-import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.google.gson.Gson;
 import com.youjun.api.modules.office.model.BussinessLitigationSourceBasicEntity;
+import com.youjun.api.modules.office.model.Word2003NamespaceContext;
+import com.youjun.api.modules.office.model.Word2007NamespaceContext;
 import com.youjun.common.api.CommonResult;
+import com.youjun.common.util.CollectionUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.hwpf.usermodel.Range;
+import org.apache.poi.hwpf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDocument1;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,33 +114,8 @@ public class OfficeController {
         range.replaceText("${basicUnderstanding}", basicUnderstanding);
         range.replaceText("${dissatisfied}", dissatisfied);
         range.replaceText("${other_satisfaction}", other_satisfaction);
-        /*//创建文档
-        XWPFDocument document = new XWPFDocument();
-        //段落XWPFParagraph
-        XWPFParagraph paragraph;
-        //基本元素XWPFRun
-        XWPFRun run;
-        //表格XWPFTable
-        XWPFTable table;
-        //创建 新段落
-        paragraph = document.createParagraph();
-        // 设置段落格式
-        // 对齐方式
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
-        // 边框
-        paragraph.setBorderBottom(Borders.DOUBLE);
-        paragraph.setBorderTop(Borders.DOUBLE);
-        paragraph.setBorderRight(Borders.DOUBLE);
-        paragraph.setBorderLeft(Borders.DOUBLE);
-        paragraph.setBorderBetween(Borders.SINGLE);
-        // 段落末尾创建XWPFRun
-        run = paragraph.createRun();
-        run.setText("为这个段落追加文本");
-        //创建新表格
-        table = doc.createTable(10, 4);
-        table.getRow(1).getCell(1).setText("代办编号");*/
         //写入文档
-        try (FileOutputStream outputStream = new FileOutputStream("D:\\out.docx")) {
+        try (FileOutputStream outputStream = new FileOutputStream("D:\\out.doc")) {
             document.write(outputStream);
         }
         return CommonResult.success(null);
@@ -136,44 +124,7 @@ public class OfficeController {
     @ApiOperation("生成word报告")
     @GetMapping("/exportWord2007")
     public CommonResult exportWord2007() throws IOException {
-        String telephone = "□";
-        String faceToFace = "□";
-        String other_feedback = "□";
-        String satisfied = "□";
-        String basicUnderstanding = "□";
-        String dissatisfied = "□";
-        String other_satisfaction = "□";
-        Integer handleOpinion = 1;
-        switch (handleOpinion) {
-            case 1:
-                telephone = "√";
-                break;
-            case 2:
-                faceToFace = "√";
-                break;
-            case 3:
-                other_feedback = "√";
-                break;
-            default:
-        }
-        Integer serverOpinion = 1;
-        switch (serverOpinion) {
-            case 1:
-                satisfied = "√";
-                break;
-            case 2:
-                basicUnderstanding = "√";
-                break;
-            case 3:
-                dissatisfied = "√";
-                break;
-            case 4:
-                other_satisfaction = "√";
-            default:
-        }
-        FileInputStream inputStream = new FileInputStream("D:\\template\\信访代办导出模板.docx");
-        XWPFDocument document = new XWPFDocument(inputStream);
-        /*//创建文档
+        //创建文档
         XWPFDocument document = new XWPFDocument();
         //段落XWPFParagraph
         XWPFParagraph paragraph;
@@ -196,8 +147,8 @@ public class OfficeController {
         run = paragraph.createRun();
         run.setText("为这个段落追加文本");
         //创建新表格
-        table = doc.createTable(10, 4);
-        table.getRow(1).getCell(1).setText("代办编号");*/
+        table = document.createTable(10, 4);
+        table.getRow(1).getCell(1).setText("代办编号");
         //写入文档
         try (FileOutputStream outputStream = new FileOutputStream("D:\\out.docx")) {
             document.write(outputStream);
@@ -206,24 +157,195 @@ public class OfficeController {
     }
 
     @RequestMapping("readWordXML")
-    public CommonResult readWordXML() {
+    public CommonResult readWordXML() throws IOException {
+        //加载文档
+//        String filePath = "D:\\template\\HZSDH20210922243（公开电话）-2003.xml";
+        String filePath = "D:\\template\\HZSDH20210922243（公开电话）.doc";
+//        String filePath = "D:\\template\\document.xml";
+        //WordExtractor
         try {
-            //加载文档
-            InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）.doc");
-//            InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）.xml");
-//            Document document = XmlUtil.readXML(inputStream);
-//            XWPFDocument doc = new XWPFDocument(inputStream);
-//            HWPFDocument doc = new HWPFDocument(inputStream);
-//            WordExtractor doc = new WordExtractor(inputStream);
-            //读取xml文件
-            HSSFWorkbook work = new HSSFWorkbook(inputStream);
-            //获取xml的表
-//            HSSFSheet sheet = work.getSheet("sheet1");
-            System.out.println("结束");
+            FileInputStream inputStream = new FileInputStream(filePath);
+            WordExtractor document = new WordExtractor(inputStream);
+            if (document != null) {
+                log.info("WordExtractor success");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("WordExtractor:" + e.getMessage());
         }
+        //HWPFDocument
+        try {
+            FileInputStream inputStream = new FileInputStream(filePath);
+            HWPFDocument document = new HWPFDocument(inputStream);
+            if (document != null) {
+                log.info("HWPFDocument success");
+            }
+        } catch (Exception e) {
+            log.error("HWPFDocument:" + e.getMessage());
+        }
+        //XWPFDocument
+        try {
+            FileInputStream inputStream = new FileInputStream(filePath);
+            XWPFDocument document = new XWPFDocument(inputStream);
+            if (document != null) {
+                log.info("XWPFDocument success");
+            }
+        } catch (Exception e) {
+            log.error("XWPFDocument:" + e.getMessage());
+        }
+        //HSSFWorkbook
+        try {
+            FileInputStream inputStream = new FileInputStream(filePath);
+            HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+            if (workbook != null) {
+                log.info("HSFWorSkbook success");
+            }
+        } catch (Exception e) {
+            log.error("HSSFWorkbook:" + e.getMessage());
+        }
+        //XSSFWorkbook
+        try {
+            FileInputStream inputStream = new FileInputStream(filePath);
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            if (workbook != null) {
+                log.info("XSSFWorkbook success");
+            }
+        } catch (Exception e) {
+            log.error("XSSFWorkbook:" + e.getMessage());
+        }
+        //readXML
+        try {
+            FileInputStream inputStream = new FileInputStream(filePath);
+            org.w3c.dom.Document document = XmlUtil.readXML(inputStream);
+            if (document != null) {
+                //判断版本 03 07
+                org.w3c.dom.Element w_wordDocument = (org.w3c.dom.Element) XmlUtil.getByXPath("//w:wordDocument", document, XPathConstants.NODE, new Word2003NamespaceContext());
+                org.w3c.dom.Element pkg_package = (org.w3c.dom.Element) XmlUtil.getByXPath("//pkg:package", document, XPathConstants.NODE, new Word2007NamespaceContext());
+                String wordBodyXpath = null;
+                NamespaceContext wordNamespaceContext = null;
+                if (w_wordDocument != null) {
+                    //03
+                    wordBodyXpath = "//w:body/wx:sect";
+                    wordNamespaceContext = new Word2003NamespaceContext();
+                } else if (pkg_package != null) {
+                    //07
+                    wordBodyXpath = "//w:body";
+                    wordNamespaceContext = new Word2007NamespaceContext();
+                } else {
+                    throw new RuntimeException("文件格式错误");
+                }
+                String titleXpath = wordBodyXpath + "/w:p[1]/w:r[1]/w:t[1]";
+                org.w3c.dom.Element element = (org.w3c.dom.Element) XmlUtil.getByXPath(titleXpath, document, XPathConstants.NODE,wordNamespaceContext);
+                String title = element.getTextContent();
+                String tableXpath = wordBodyXpath + "/w:tbl[1]";
+                //编号
+                String letterNumber = getCellValueFromTable(wordNamespaceContext,tableXpath, document, 0, 1);
+                if (!org.springframework.util.StringUtils.hasText(letterNumber)) {
+                    throw new RuntimeException("编号 不能为空");
+                }
+
+
+                log.info("readXML success");
+            }
+        } catch (Exception e) {
+            log.error("readXML:" + e.getMessage());
+        }
+        //Dom4j
+        try {
+            SAXReader reader = new SAXReader();
+            FileInputStream inputStream = new FileInputStream(filePath);
+            Document document = reader.read(inputStream);
+            if (document != null) {
+                //获取根节点元素对象
+                Element root = document.getRootElement();
+                Element wordBody = null;
+                if ("wordDocument".equalsIgnoreCase(root.getName())) {
+                    //word.xml 2003
+                    List<Node> sect = document.selectNodes("sect");
+                    wordBody = (Element) sect.get(0);
+                } else if ("package".equalsIgnoreCase(root.getName())) {
+                    //word.xml 2007
+                    //遍历
+                    Iterator<Element> iterator = root.elementIterator();
+                    while (iterator.hasNext()&&wordBody==null) {
+                        Element element = iterator.next();
+                        //首先获取当前节点的所有属性节点
+                        List<Attribute> attributes = element.attributes();
+                        if (CollectionUtils.isNotEmpty(attributes)) {
+                            for (Attribute attribute : attributes) {
+                                //判断获取 word.xml 的内容部分part标签
+                                if ("name".equalsIgnoreCase(Optional.ofNullable(attribute.getName()).orElse(""))
+                                        && "/word/document.xml".equalsIgnoreCase(Optional.ofNullable(attribute.getValue()).orElse(""))) {
+                                    wordBody = element;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                }
+                listNodes(wordBody);
+                log.info("readXML success");
+            }
+        } catch (Exception e) {
+            log.error("readXML:" + e.getMessage());
+        }
+        System.out.println("结束");
         return CommonResult.success(null);
+    }
+
+    //w3c dom xml
+    public String getCellValueFromTable(NamespaceContext wordNamespaceContext,String tableXpath, org.w3c.dom.Document document, int rowIndex, int columnIndex) throws XPathExpressionException {
+        //索引值从1开始  参数从0开始  需加1
+        rowIndex++;
+        columnIndex++;
+        String runsXpath = tableXpath + "/w:tr[" + rowIndex + "]/w:tc[" + columnIndex + "]/w:p[1]/w:r/w:t[1]";
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        //设置 xml命名空间uri
+        xPath.setNamespaceContext(wordNamespaceContext);
+        NodeList nodeList = null;
+        if (document instanceof InputSource) {
+            nodeList = (NodeList) xPath.evaluate(runsXpath, (InputSource) document, XPathConstants.NODESET);
+        } else {
+            nodeList = (NodeList) xPath.evaluate(runsXpath, document, XPathConstants.NODESET);
+        }
+        //hutool封装方法
+        //Element paragraphsElement = (Element) XmlUtil.getByXPath(valueXpath, document, XPathConstants.NODESET, new WordNamespaceContext());
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; null != nodeList && i < nodeList.getLength(); i++) {
+            org.w3c.dom.Element run = (org.w3c.dom.Element) nodeList.item(i);
+            buffer.append(run.getTextContent());
+        }
+        return StringUtils.isNotBlank(buffer) ? buffer.toString() : "";
+    }
+
+    //遍历当前节点下的所有节点
+    public void listNodes(Element node) {
+        System.out.print("当前节点的名称：" + node.getName());
+        //首先获取当前节点的所有属性节点
+        List<Attribute> list = node.attributes();
+        //遍历属性节点
+        System.out.print(",属性：{");
+        boolean isFirst = true;
+        for (Attribute attribute : list) {
+            if (isFirst) {
+                isFirst = false;
+                System.out.print(attribute.getName() + ":" + attribute.getValue());
+            } else {
+                System.out.print("," + attribute.getName() + ":" + attribute.getValue());
+            }
+        }
+        System.out.print("}\n");
+        //如果当前节点内容不为空，则输出
+        if (!(node.getTextTrim().equals(""))) {
+            System.out.println("        文本{" + node.getName() + "：" + node.getText() + "}");
+        }
+        //同时迭代当前节点下面的所有子节点
+        //使用递归
+        Iterator<org.dom4j.Element> iterator = node.elementIterator();
+        while (iterator.hasNext()) {
+            Element e = iterator.next();
+            listNodes(e);
+        }
     }
 
     @RequestMapping("readWord2003")
@@ -232,6 +354,37 @@ public class OfficeController {
             //加载文档
             InputStream inputStream = new FileInputStream("D:\\template\\HZSDH20210922243（公开电话）-2003.doc");
             HWPFDocument doc = new HWPFDocument(inputStream);
+            Range range = doc.getRange();
+            // 段落
+            for (int i = 0; i < range.numParagraphs(); i++) {
+                System.out.println("第" + i + "个段落：" + range.getParagraph(i).text());
+            }
+            //表格
+            TableIterator tableIterator = new TableIterator(range);
+            Table table;
+            TableRow row;
+            TableCell cell;
+            int i = 0;
+            while (tableIterator.hasNext()) {
+                System.out.println("第" + (i++) + "个表格");
+                table = tableIterator.next();
+                for (int j = 0; j < table.numRows(); j++) {
+                    System.out.println("        第" + j + "行");
+                    row = table.getRow(j);
+                    for (int k = 0; k < row.numCells(); k++) {
+                        cell = row.getCell(k);
+                        String value = cell.text();
+                        value = value
+                                .replace("\r", "")
+                                .replace("\n", "")
+                                .replace("\t", "")
+                                .trim();
+                        System.out.println("            第" + k + "列:" + value);
+                    }
+                }
+            }
+
+            System.out.println();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -247,19 +400,19 @@ public class OfficeController {
             XWPFDocument doc = new XWPFDocument(inputStream);
             // 段落
             List<XWPFParagraph> paragraphs = doc.getParagraphs();
-            i=0;
+            i = 0;
             for (XWPFParagraph paragraph : paragraphs) {
-                System.out.println("第"+(i++)+"个段落：" + paragraph.getText());
+                System.out.println("第" + (i++) + "个段落：" + paragraph.getText());
             }
             // 表格
             List<XWPFTable> tables = doc.getTables();
-             i = 0;
+            i = 0;
             for (XWPFTable table : tables) {
                 System.out.println("第" + (i++) + "个表格");
-                 j = 0;
+                j = 0;
                 for (XWPFTableRow row : table.getRows()) {
                     System.out.println("        第" + (j++) + "行");
-                     k = 0;
+                    k = 0;
                     for (XWPFTableCell cell : row.getTableCells()) {
                         String value = cell.getParagraphs().stream().map(XWPFParagraph::getText).collect(Collectors.joining());
                         System.out.println("            第" + (k++) + "列:" + value);
