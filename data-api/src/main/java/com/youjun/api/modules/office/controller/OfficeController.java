@@ -214,7 +214,14 @@ public class OfficeController {
         }
         //readXML
         try {
+            //加载文档
             FileInputStream inputStream = new FileInputStream(filePath);
+            /*//创建解析工厂DocumentBuilderFactory
+            DocumentBuilderFactory builderFactory=DocumentBuilderFactory.newInstance("com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl", (ClassLoader)null);
+            //指定DocumentBuilder实例
+            DocumentBuilder domBuilder=builderFactory.newDocumentBuilder();
+            //创建Document对象
+            org.w3c.dom.Document document=domBuilder.parse(new InputSource(file.getInputStream()));*/
             org.w3c.dom.Document document = XmlUtil.readXML(inputStream);
             if (document != null) {
                 //判断版本 03 07
