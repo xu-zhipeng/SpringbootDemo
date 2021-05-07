@@ -89,6 +89,7 @@ public class MyBatisPlusGenerator {
         dataSourceConfig.setDriverName(props.getStr("dataSource.driverName"));
         dataSourceConfig.setUsername(props.getStr("dataSource.username"));
         dataSourceConfig.setPassword(props.getStr("dataSource.password"));
+        dataSourceConfig.setSchemaName(props.getStr("dataSource.schemaName"));
         return dataSourceConfig;
     }
 
