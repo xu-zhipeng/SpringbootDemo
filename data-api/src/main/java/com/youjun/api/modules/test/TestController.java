@@ -3,13 +3,9 @@ package com.youjun.api.modules.test;
 import com.youjun.api.modules.test.model.UserDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
-import javax.jws.soap.SOAPBinding;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -21,6 +17,7 @@ import java.util.Date;
  * @author kirk
  * @since 2020/12/1
  */
+@Slf4j
 @RestController
 @Api(tags = "TestController", description = "测试Controller")
 @RequestMapping("/Test")
@@ -69,5 +66,16 @@ public class TestController {
         userDate.setTime3(time3);
         userDate.setTime4(time4);
         return userDate;
+    }
+
+    @ApiOperation(value = "测试logback")
+    @GetMapping("/testLogback")
+    public String testLogback(){
+        log.trace("trace");
+        log.debug("debug");
+        log.info("info");
+        log.warn("warn");
+        log.error("error");
+        return "testLogback";
     }
 }

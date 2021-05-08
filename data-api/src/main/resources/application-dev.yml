@@ -38,7 +38,6 @@ spring:
     timeout: 300ms # 连接超时时间（毫秒）
 
 logging:
-  config: classpath:logback-spring-dev.xml
   level:
     root: info
     com.youjun.api: debug
