@@ -1,12 +1,15 @@
 package com.youjun.common.api;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分页数据封装类
  * Created by macro on 2019/4/19.
  */
 public class CommonPage<T> {
+
     private Integer current;
     private Integer pageSize;
     private Integer totalPage;
@@ -38,6 +41,34 @@ public class CommonPage<T> {
         result.setTotal(pageResult.getTotalElements());
         result.setTotalPage((int) (pageResult.getTotalElements() / pageResult.getSize() + 1));
         result.setList(pageResult.getContent());
+        return result;
+    }
+
+    /**
+     * 将MyBatis Plus 分页结果转化为Map
+     */
+    public static <T> Map<String,Object> restPageToMap(com.baomidou.mybatisplus.core.metadata.IPage<T> pageResult) {
+        Map<String,Object> result = new HashMap<>();
+        //默认页码从1开始
+        result.put("current",pageResult.getCurrent());
+        result.put("pageSize",pageResult.getSize());
+        result.put("total",pageResult.getTotal());
+        result.put("totalPage",(pageResult.getTotal() / pageResult.getSize() + 1));
+        result.put("data",pageResult.getRecords());
+        return result;
+    }
+
+    /**
+     * 将data jpa 分页结果转化为Map
+     */
+    public static <T> Map<String,Object> restPageToMap(org.springframework.data.domain.Page<T> pageResult) {
+        Map<String,Object> result = new HashMap<>();
+        //默认页码从0开始
+        result.put("current",pageResult.getNumber() + 1);
+        result.put("pageSize",pageResult.getSize());
+        result.put("total",pageResult.getTotalElements());
+        result.put("totalPage",(pageResult.getTotalElements() / pageResult.getSize() + 1));
+        result.put("data",pageResult.getContent());
         return result;
     }
 

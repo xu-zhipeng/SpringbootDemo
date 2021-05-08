@@ -1,23 +1,46 @@
 package com.youjun.common.api;
 
+import com.fasterxml.jackson.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 通用返回对象
- * Created by macro on 2019/4/19.
+ *
+ * @author kirk
+ * @date 2019/4/19
  */
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CommonResult<T> {
-    private boolean success;
-    private long errorCode;
+    private Boolean success;
+    private Long errorCode;
     private String errorMessage;
     private T data;
+    /**
+     * 应答扩展
+     */
+    @JsonIgnore
+    private final Map<String, Object> attachments = new HashMap<>();
 
     protected CommonResult() {
     }
 
-    protected CommonResult(boolean success, long errorCode, String errorMessage, T data) {
+    protected CommonResult(Boolean success, Long errorCode, String errorMessage, T data) {
         this.success = success;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
         this.data = data;
+    }
+
+    protected CommonResult(Boolean success, Long errorCode, String errorMessage, T data, Map<String, Object> attachments) {
+        this.success = success;
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
+        this.data = data;
+        this.getAttachments().putAll(attachments);
     }
 
     /**
@@ -31,12 +54,13 @@ public class CommonResult<T> {
 
     /**
      * 成功返回结果
-     *
-     * @param data    获取的数据
-     * @param message 提示信息
+     * @param data 获取的数据
+     * @param attachments 应答扩展
+     * @param <T>
+     * @return
      */
-    public static <T> CommonResult<T> success(T data, String message) {
-        return new CommonResult<T>(true, ResultCode.SUCCESS.getCode(), message, data);
+    public static <T> CommonResult<T> success(T data, Map<String, Object> attachments) {
+        return new CommonResult<T>(true, ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data,attachments);
     }
 
     /**
@@ -94,14 +118,14 @@ public class CommonResult<T> {
      * 未登录返回结果
      */
     public static <T> CommonResult<T> unauthorized(T data) {
-        return new CommonResult<T>(false,ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getMessage(), data);
+        return new CommonResult<T>(false, ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getMessage(), data);
     }
 
     /**
      * 未授权返回结果
      */
     public static <T> CommonResult<T> forbidden(T data) {
-        return new CommonResult<T>(false,ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getMessage(), data);
+        return new CommonResult<T>(false, ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getMessage(), data);
     }
 
     public boolean isSuccess() {
@@ -134,5 +158,16 @@ public class CommonResult<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+
+    @JsonAnySetter
+    public void setAttachments(String key, String value) {
+        attachments.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAttachments() {
+        return attachments;
     }
 }
