@@ -65,12 +65,6 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
-        <!--Velocity模板引擎-->
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
-            <version>${velocity.version}</version>
-        </dependency>
         <!-- gson依赖 -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -108,12 +102,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-excelant</artifactId>
             <version>${poi.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
         </dependency>
 
         <!-- dom4j xml解析 -->
