@@ -7,7 +7,7 @@ import java.util.List;
  * Created by macro on 2019/4/19.
  */
 public class CommonPage<T> {
-    private Integer pageNum;
+    private Integer current;
     private Integer pageSize;
     private Integer totalPage;
     private Long total;
@@ -19,7 +19,7 @@ public class CommonPage<T> {
     public static <T> CommonPage<T> restPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<T> pageResult) {
         CommonPage<T> result = new CommonPage<>();
         //默认页码从1开始
-        result.setPageNum((int) pageResult.getCurrent());
+        result.setCurrent((int) pageResult.getCurrent());
         result.setPageSize((int) pageResult.getSize());
         result.setTotal(pageResult.getTotal());
         result.setTotalPage((int) (pageResult.getTotal() / pageResult.getSize() + 1));
@@ -33,7 +33,7 @@ public class CommonPage<T> {
     public static <T> CommonPage<T> restPage(org.springframework.data.domain.Page<T> pageResult) {
         CommonPage<T> result = new CommonPage<>();
         //默认页码从0开始
-        result.setPageNum(pageResult.getNumber() + 1);
+        result.setCurrent(pageResult.getNumber() + 1);
         result.setPageSize(pageResult.getSize());
         result.setTotal(pageResult.getTotalElements());
         result.setTotalPage((int) (pageResult.getTotalElements() / pageResult.getSize() + 1));
@@ -42,12 +42,12 @@ public class CommonPage<T> {
     }
 
 
-    public Integer getPageNum() {
-        return pageNum;
+    public Integer getCurrent() {
+        return current;
     }
 
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
+    public void setCurrent(Integer current) {
+        this.current = current;
     }
 
     public Integer getPageSize() {
