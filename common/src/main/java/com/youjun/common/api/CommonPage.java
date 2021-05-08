@@ -16,7 +16,7 @@ public class CommonPage<T> {
     /**
      * 将MyBatis Plus 分页结果转化为通用结果
      */
-    public static <T> CommonPage<T> restPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<T> pageResult) {
+    public static <T> CommonPage<T> restPage(com.baomidou.mybatisplus.core.metadata.IPage<T> pageResult) {
         CommonPage<T> result = new CommonPage<>();
         //默认页码从1开始
         result.setCurrent((int) pageResult.getCurrent());
