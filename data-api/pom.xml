@@ -117,6 +117,49 @@
             <version>1.2.0</version>
         </dependency>
 
+        <!--ipfs start-->
+        <!-- https://mvnrepository.com/artifact/com.github.ipfs/java-ipfs-http-client -->
+        <dependency>
+            <groupId>com.github.ipfs</groupId>
+            <artifactId>java-ipfs-http-client</artifactId>
+            <version>v1.3.3</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/ipfs/java-ipfs-http-client-v1.3.3.jar</systemPath>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.multiformats/java-multiaddr -->
+        <dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multiaddr</artifactId>
+            <version>v1.4.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/ipfs/java-multiaddr-v1.4.1.jar</systemPath>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.ipld/java-cid -->
+        <dependency>
+            <groupId>com.github.ipld</groupId>
+            <artifactId>java-cid</artifactId>
+            <version>v1.3.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/ipfs/java-cid-v1.3.1.jar</systemPath>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.multiformats/java-multihash -->
+        <dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multihash</artifactId>
+            <version>v1.3.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/ipfs/java-multihash-v1.3.0.jar</systemPath>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.multiformats/java-multibase -->
+        <dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multibase</artifactId>
+            <version>v1.1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/ipfs/java-multibase-v1.1.0.jar</systemPath>
+        </dependency>
+        <!--ipfs end-->
+
     </dependencies>
 
     <build>
