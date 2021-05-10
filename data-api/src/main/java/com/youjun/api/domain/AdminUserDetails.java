@@ -2,8 +2,12 @@ package com.youjun.api.domain;
 
 import com.youjun.api.modules.ums.model.UmsAdmin;
 import com.youjun.api.modules.ums.model.UmsResource;
+import com.youjun.common.api.ResultCode;
+import com.youjun.common.exception.Asserts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
  * SpringSecurity需要的用户详情
  * Created by macro on 2018/4/26.
  */
+@Slf4j
 public class AdminUserDetails implements UserDetails {
     private UmsAdmin umsAdmin;
     private List<UmsResource> resourceList;
@@ -58,5 +63,19 @@ public class AdminUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return umsAdmin.getStatus().equals(1);
+    }
+
+    /**
+     * 获取当前登录用户
+     * @return
+     */
+    public static Object getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(null==principal){
+            log.error("Access current user failed");
+            //暂未登录或token已经过期  throw new RuntimeException();
+            Asserts.fail(ResultCode.UNAUTHORIZED);
+        }
+        return principal;
     }
 }
