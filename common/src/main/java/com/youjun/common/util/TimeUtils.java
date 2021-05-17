@@ -3,7 +3,6 @@ package com.youjun.common.util;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * <p>
@@ -13,7 +12,7 @@ import java.util.Locale;
  * @author kirk
  * @since 2020/12/31
  */
-public class TimeUtil {
+public class TimeUtils {
     /**
      * 获取当前时间（全部）   yyyy-MM-dd HH:mm:ss
      *
