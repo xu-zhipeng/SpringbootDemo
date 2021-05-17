@@ -27,3 +27,15 @@ target/
 
 ### VS Code ###
 .vscode/
+
+# Eclipse, ctags, Mac metadata, log files
+.classpath
+.project
+.settings
+tags
+*.log
+*.orig
+
+# Gradle:
+.gradle
+/gradle-plugins/gradle*
