@@ -32,7 +32,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("${CommonValues.base_url}/file")
+@RequestMapping("/file")
 public class FileController {
     @Autowired
     @Qualifier("ipfsFileServiceImpl")
