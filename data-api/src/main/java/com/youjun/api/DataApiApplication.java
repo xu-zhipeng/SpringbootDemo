@@ -3,6 +3,7 @@ package com.youjun.api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScans;
 
 /**
  * <p>
@@ -13,6 +14,10 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @since 2020/10/19
  */
 @SpringBootApplication
+@ComponentScans(value = {
+//        @ComponentScan("com.youjun.common"),
+//        @ComponentScan("com.youjun.security"),
+})
 public class DataApiApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(DataApiApplication.class, args);

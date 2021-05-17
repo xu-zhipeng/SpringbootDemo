@@ -14,7 +14,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,27 +30,32 @@ import java.util.Map;
 
 /**
  * 统一日志处理切面
- * Created by macro on 2018/4/26.
+ *
+ * @author kirk
+ * @date 2021/5/01
  */
 @Aspect
-@Component
 @Order(1)
 public class WebLogAspect {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebLogAspect.class);
 
-    @Pointcut("execution(public * com.youjun.*.controller.*.*(..))||execution(public * com.youjun.api.*.controller.*.*(..))")
+    @Pointcut("@annotation(com.youjun.common.log.Log)")
+    public void log() {
+    }
+
+    @Pointcut("execution(public * com.youjun..controller.*.*(..))")
     public void webLog() {
     }
 
-    @Before("webLog()")
-    public void doBefore(JoinPoint joinPoint) throws Throwable {
+    @Before("webLog() || log()")
+    public void doBefore(JoinPoint joinPoint) {
     }
 
-    @AfterReturning(value = "webLog()", returning = "ret")
-    public void doAfterReturning(Object ret) throws Throwable {
+    @AfterReturning(value = "webLog() || log()", returning = "ret")
+    public void doAfterReturning(Object ret) {
     }
 
-    @Around("webLog()")
+    @Around("webLog() || log()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         //获取当前请求对象
@@ -78,12 +82,12 @@ public class WebLogAspect {
         webLog.setStartTime(startTime);
         webLog.setUri(request.getRequestURI());
         webLog.setUrl(request.getRequestURL().toString());
-        Map<String,Object> logMap = new HashMap<>();
-        logMap.put("url",webLog.getUrl());
-        logMap.put("method",webLog.getMethod());
-        logMap.put("parameter",webLog.getParameter());
-        logMap.put("spendTime",webLog.getSpendTime());
-        logMap.put("description",webLog.getDescription());
+        Map<String, Object> logMap = new HashMap<>();
+        logMap.put("url", webLog.getUrl());
+        logMap.put("method", webLog.getMethod());
+        logMap.put("parameter", webLog.getParameter());
+        logMap.put("spendTime", webLog.getSpendTime());
+        logMap.put("description", webLog.getDescription());
 //        LOGGER.info("{}", JSONUtil.parse(webLog));
         LOGGER.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
         return result;
