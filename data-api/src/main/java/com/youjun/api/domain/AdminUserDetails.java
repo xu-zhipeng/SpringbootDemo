@@ -16,7 +16,9 @@ import java.util.stream.Collectors;
 
 /**
  * SpringSecurity需要的用户详情
- * Created by macro on 2018/4/26.
+ *
+ * @author kirk
+ * @date 2021/5/01
  */
 @Slf4j
 public class AdminUserDetails implements UserDetails {
@@ -38,6 +40,10 @@ public class AdminUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return umsAdmin.getPassword();
+    }
+
+    public String getUserId() {
+        return umsAdmin.getId().toString();
     }
 
     @Override
@@ -69,13 +75,17 @@ public class AdminUserDetails implements UserDetails {
      * 获取当前登录用户
      * @return
      */
-    public static Object getCurrentUser() {
+    public static AdminUserDetails getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(null==principal){
             log.error("Access current user failed");
             //暂未登录或token已经过期  throw new RuntimeException();
             Asserts.fail(ResultCode.UNAUTHORIZED);
         }
-        return principal;
+        return (AdminUserDetails)principal;
+       /* UmsAdmin umsAdmin = new UmsAdmin();
+        umsAdmin.setId("1");
+        umsAdmin.setUsername("test");
+        return new AdminUserDetails(umsAdmin, Collections.EMPTY_LIST);*/
     }
 }
