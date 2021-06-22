@@ -3,6 +3,7 @@ package com.youjun.api.modules.office.controller;
 import cn.hutool.core.util.XmlUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.cell.CellUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.google.gson.Gson;
 import com.youjun.api.modules.office.model.BussinessLitigationSourceBasicEntity;
@@ -15,7 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.hwpf.usermodel.Table;
 import org.apache.poi.hwpf.usermodel.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
@@ -241,11 +247,11 @@ public class OfficeController {
                     throw new RuntimeException("文件格式错误");
                 }
                 String titleXpath = wordBodyXpath + "/w:p[1]/w:r[1]/w:t[1]";
-                org.w3c.dom.Element element = (org.w3c.dom.Element) XmlUtil.getByXPath(titleXpath, document, XPathConstants.NODE,wordNamespaceContext);
+                org.w3c.dom.Element element = (org.w3c.dom.Element) XmlUtil.getByXPath(titleXpath, document, XPathConstants.NODE, wordNamespaceContext);
                 String title = element.getTextContent();
                 String tableXpath = wordBodyXpath + "/w:tbl[1]";
                 //编号
-                String letterNumber = getCellValueFromTable(wordNamespaceContext,tableXpath, document, 0, 1);
+                String letterNumber = getCellValueFromTable(wordNamespaceContext, tableXpath, document, 0, 1);
                 if (!org.springframework.util.StringUtils.hasText(letterNumber)) {
                     throw new RuntimeException("编号 不能为空");
                 }
@@ -273,7 +279,7 @@ public class OfficeController {
                     //word.xml 2007
                     //遍历
                     Iterator<Element> iterator = root.elementIterator();
-                    while (iterator.hasNext()&&wordBody==null) {
+                    while (iterator.hasNext() && wordBody == null) {
                         Element element = iterator.next();
                         //首先获取当前节点的所有属性节点
                         List<Attribute> attributes = element.attributes();
@@ -301,7 +307,7 @@ public class OfficeController {
     }
 
     //w3c dom xml
-    public String getCellValueFromTable(NamespaceContext wordNamespaceContext,String tableXpath, org.w3c.dom.Document document, int rowIndex, int columnIndex) throws XPathExpressionException {
+    public String getCellValueFromTable(NamespaceContext wordNamespaceContext, String tableXpath, org.w3c.dom.Document document, int rowIndex, int columnIndex) throws XPathExpressionException {
         //索引值从1开始  参数从0开始  需加1
         rowIndex++;
         columnIndex++;
@@ -518,7 +524,7 @@ public class OfficeController {
             //加载Excel
             InputStream inputStream = new FileInputStream("D:\\template\\诉源事件批量导入模板 .xlsx");
             //POI 读取Excel  WorkbookFactory 自动兼容 2003和2007
-            //Workbook workbook = WorkbookFactory.create(inputStream);
+            Workbook workbook = WorkbookFactory.create(inputStream);
             //Sheet hssfSheet = workbook.getSheetAt(0);  //示意访问sheet
 
             // 2.应用HUtool ExcelUtil获取ExcelReader指定输入流和sheet
@@ -599,6 +605,70 @@ public class OfficeController {
 
     @RequestMapping("downloadExcel")
     public CommonResult downloadExcel() {
+        return CommonResult.success(null);
+    }
+
+
+    @RequestMapping("readExcelStyleTest")
+    public CommonResult readExcelStyleTest() {
+        try {
+            //加载Excel
+            InputStream inputStream = new FileInputStream("D:\\template\\A1001主协议.xlsx");
+            //POI 读取Excel  WorkbookFactory 自动兼容 2003和2007
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            //Sheet hssfSheet = workbook.getSheetAt(0);  //示意访问sheet
+            Sheet sheet = workbook.getSheetAt(1);
+            // 获取行
+            Iterator<Row> rows = sheet.rowIterator();
+            Row row;
+            Cell cell;
+            while (rows.hasNext()) {
+                //获取 行
+                row = rows.next();
+                Iterator<Cell> cells = row.cellIterator();
+                while (cells.hasNext()) {
+                    // 获取单元格
+                    cell = cells.next();
+                    HashMap<String, Object> map = new HashMap<>();
+                    org.apache.poi.ss.util.CellUtil.setCellStyleProperties(cell,map);
+                    Object cellValue = CellUtil.getCellValue(cell);
+                    CellStyle cellStyle = cell.getCellStyle();
+                    short fillBackgroundColor = cellStyle.getFillBackgroundColor();
+                    short fillForegroundColor = cellStyle.getFillForegroundColor();
+
+
+                    System.out.print(cellValue + " ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+            //重新写入
+            XSSFWorkbook workbook1 = new XSSFWorkbook();//这里也可以设置sheet的Name
+            //创建工作表对象
+            XSSFSheet sheet1 = workbook1.createSheet();
+            //创建工作表的行
+            XSSFRow row1 = sheet1.createRow(0);//设置第一行，从零开始
+            XSSFCell cell1 = row1.createCell(2);
+            cell1.setCellValue("aaaaaaaaaaaa");//第一行第三列为aaaaaaaaaaaa
+            CellStyle cellStyle = workbook1.createCellStyle();
+            cellStyle.setFillBackgroundColor(IndexedColors.RED.getIndex());
+//            cellStyle.setFillForegroundColor(IndexedColors.BLACK1.getIndex());
+//            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
+           /* CellStyle style = workbook1.createCellStyle();
+            style.setFillBackgroundColor(IndexedColors.AQUA.getIndex());
+            style.setFillPattern(FillPatternType.BIG_SPOTS);*/
+
+            cell1.setCellStyle(cellStyle);
+            row1.createCell(0).setCellValue(new Date());//第一行第一列为日期
+            workbook1.setSheetName(0, "sheet的Name");//设置sheet的Name
+            FileOutputStream out = new FileOutputStream("D:\\template\\A1001主协议1.xlsx");
+            workbook1.write(out);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return CommonResult.success(null);
     }
 
