@@ -3,7 +3,11 @@ package com.youjun.common.log;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.gson.Gson;
 import com.youjun.common.domain.WebLog;
+import com.youjun.common.service.WebLogAspectService;
+import com.youjun.common.util.StringUtils;
+import com.youjun.common.util.TimeUtils;
 import io.swagger.annotations.ApiOperation;
 import net.logstash.logback.marker.Markers;
 import org.aspectj.lang.JoinPoint;
@@ -13,8 +17,8 @@ import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -37,7 +41,16 @@ import java.util.Map;
 @Aspect
 @Order(1)
 public class WebLogAspect {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebLogAspect.class);
+    private static final Logger log = LoggerFactory.getLogger(WebLogAspect.class);
+
+    final Gson gson=new Gson();
+
+    final WebLogAspectService webLogAspectService;
+
+    @Autowired
+    public WebLogAspect(WebLogAspectService webLogAspectService) {
+        this.webLogAspectService = webLogAspectService;
+    }
 
     @Pointcut("@annotation(com.youjun.common.log.Log)")
     public void log() {
@@ -74,12 +87,14 @@ public class WebLogAspect {
         long endTime = System.currentTimeMillis();
         String urlStr = request.getRequestURL().toString();
         webLog.setBasePath(StrUtil.removeSuffix(urlStr, URLUtil.url(urlStr).getPath()));
-        webLog.setIp(request.getRemoteUser());
+//        webLog.setIp(request.getRemoteUser());
+        webLog.setIp(getIpAddress(request));
         webLog.setMethod(request.getMethod());
-        webLog.setParameter(getParameter(method, joinPoint.getArgs()));
-        webLog.setResult(result);
+        Object parameter = getParameter(method, joinPoint.getArgs());
+        webLog.setParameter(gson.toJson(parameter));
+        webLog.setResult(gson.toJson(result));
         webLog.setSpendTime((int) (endTime - startTime));
-        webLog.setStartTime(startTime);
+        webLog.setStartTime(TimeUtils.timestampToDateTime(startTime));
         webLog.setUri(request.getRequestURI());
         webLog.setUrl(request.getRequestURL().toString());
         Map<String, Object> logMap = new HashMap<>();
@@ -88,8 +103,9 @@ public class WebLogAspect {
         logMap.put("parameter", webLog.getParameter());
         logMap.put("spendTime", webLog.getSpendTime());
         logMap.put("description", webLog.getDescription());
-//        LOGGER.info("{}", JSONUtil.parse(webLog));
-        LOGGER.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
+        //LOGGER.info("{}", JSONUtil.parse(webLog));
+        log.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
+        webLogAspectService.save(webLog);
         return result;
     }
 
@@ -104,18 +120,22 @@ public class WebLogAspect {
             RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
             if (requestBody != null) {
                 argList.add(args[i]);
+                continue;
             }
             //将RequestParam注解修饰的参数作为请求参数
             RequestParam requestParam = parameters[i].getAnnotation(RequestParam.class);
             if (requestParam != null) {
                 Map<String, Object> map = new HashMap<>();
                 String key = parameters[i].getName();
-                if (!StringUtils.isEmpty(requestParam.value())) {
+                if (StringUtils.isNotBlank(requestParam.value())) {
                     key = requestParam.value();
                 }
                 map.put(key, args[i]);
                 argList.add(map);
+                continue;
             }
+            //都不是
+            argList.add(args[i]);
         }
         if (argList.size() == 0) {
             return null;
@@ -124,5 +144,45 @@ public class WebLogAspect {
         } else {
             return argList;
         }
+    }
+
+    public static String getIpAddress(HttpServletRequest request) {
+        String Xip = request.getHeader("X-Real-IP");
+        String XFor = request.getHeader("X-Forwarded-For");
+        //多次反向代理后会有多个ip值，第一个ip才是真实ip
+        if (StringUtils.isNotEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)) {
+            int index = XFor.indexOf(",");
+            if (index != -1) {
+                return XFor.substring(0, index);
+            } else {
+                return XFor;
+            }
+        }
+        XFor = Xip;
+        if(StringUtils.isNotEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)) {
+            return XFor;
+        }
+
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("Proxy-Client-IP");
+        }
+
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("WL-Proxy-Client-IP");
+        }
+
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("HTTP_CLIENT_IP");
+        }
+
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getRemoteAddr();
+        }
+
+        return XFor;
     }
 }

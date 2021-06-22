@@ -1,7 +1,13 @@
 package com.youjun.common.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
 
 /**
  * Controller层的日志封装类
@@ -9,10 +15,13 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@TableName(schema = "ums",value = "web_log")
+@ApiModel(value="WebLog对象", description="操作日志对象")
 public class WebLog {
     /**
      * 操作描述
      */
+    @TableId(type = IdType.ASSIGN_UUID)
     private String description;
 
     /**
@@ -23,7 +32,7 @@ public class WebLog {
     /**
      * 操作时间
      */
-    private Long startTime;
+    private LocalDateTime startTime;
 
     /**
      * 消耗时间
@@ -58,11 +67,11 @@ public class WebLog {
     /**
      * 请求参数
      */
-    private Object parameter;
+    private String parameter;
 
     /**
      * 返回结果
      */
-    private Object result;
+    private String result;
 
 }
