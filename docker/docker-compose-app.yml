@@ -1,0 +1,25 @@
+version: '3'
+services:
+  csi-trans-v3:
+    #没有镜像 利用 Dockerfile 本地构建镜像
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    #有镜像直接指定镜像
+#    image: csi-trans/csi-trans-v3:1.0-SNAPSHOT
+    container_name: csi-trans-v3
+    ports:
+      - 7070:7070
+    volumes:
+      - /csi-trans-v3/logs:/tmp/logs
+      - /etc/localtime:/etc/localtime
+    environment:
+      - TZ=Asia/Shanghai
+      - POSTGRES_HOST=postgres #使用域名访问
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=transv3
+      - REDIS_HOST=redis  #使用域名访问
+      - REDIS_PORT=6379
+    external_links:
+      - redis:redis #可以用redis这个域名访问redis服务
+      - postgres:postgres #可以用postgres这个域名访问postgres服务
