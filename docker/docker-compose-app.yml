@@ -11,7 +11,7 @@ services:
     ports:
       - 7070:7070
     volumes:
-      - /csi-trans-v3/logs:/tmp/logs
+      - /docker-env/logs:/tmp/logs
       - /etc/localtime:/etc/localtime
     environment:
       - TZ=Asia/Shanghai
