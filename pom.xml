@@ -33,6 +33,7 @@
         <docker.maven.plugin.version>1.2.2</docker.maven.plugin.version>
         <druid.version>1.1.23</druid.version>
         <hutool.version>5.6.2</hutool.version>
+        <guava.version>30.1.1-jre</guava.version>
         <swagger2.version>2.9.2</swagger2.version>
         <swagger-models.version>1.6.0</swagger-models.version>
         <swagger-annotations.version>1.6.0</swagger-annotations.version>
@@ -51,6 +52,7 @@
         <minio.version>7.1.0</minio.version>
         <gson.version>2.8.5</gson.version>
         <weixin-java.version>4.0.0</weixin-java.version>
+        <kaptcha.version>0.0.9</kaptcha.version>
         <!--系统子模块-->
         <common.version>1.0-SNAPSHOT</common.version>
         <data-api.version>1.0-SNAPSHOT</data-api.version>
@@ -84,25 +86,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--SpringBoot配置处理-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <!--Hutool Java工具包-->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
         </dependency>
         <!--lombok依赖-->
         <dependency>
@@ -115,6 +104,18 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
+        </dependency>
+        <!-- guava 工具包 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <!--Hutool Java工具包-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
 
@@ -277,6 +278,12 @@
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-miniapp</artifactId>
                 <version>${weixin-java.version}</version>
+            </dependency>
+            <!-- guava 工具包 -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

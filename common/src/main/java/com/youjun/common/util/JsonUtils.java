@@ -2,6 +2,7 @@ package com.youjun.common.util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class JsonUtils {
     public static class SerializationException extends RuntimeException{
@@ -69,11 +71,19 @@ public class JsonUtils {
         return resultMap;
     }
 
-    public static <T> T fromJson(String context,Class<T> clazz ) throws SerializationException {
+    public static <T> T fromJson(String content,Class<T> valueType ) throws SerializationException {
         try{
-            return mapper.readValue(context, clazz);
+            return mapper.readValue(content, valueType);
         }catch (IOException e){
-            throw new SerializationException(String.format("Failed to decode: [%s]", context));
+            throw new SerializationException(String.format("Failed to decode: [%s]", content));
+        }
+    }
+
+    public static <T> T fromJson(String content, TypeReference<T> valueTypeRef ) throws SerializationException {
+        try{
+            return mapper.readValue(content, valueTypeRef);
+        }catch (IOException e){
+            throw new SerializationException(String.format("Failed to decode: [%s]", content));
         }
     }
 
@@ -86,6 +96,14 @@ public class JsonUtils {
             } catch (IOException e) {
                 throw new SerializationException(String.format("Failed to decode: [%s]", context));
             }
+        }
+        return resultMap;
+    }
+    public static LinkedHashMap<String, Object> fromJsonNodeToLinkedHashMap(JsonNode jsonNode) throws SerializationException {
+        LinkedHashMap<String, Object> resultMap = null;
+        if (Objects.nonNull(jsonNode)) {
+            JavaType type = mapper.getTypeFactory().constructParametricType(LinkedHashMap.class, String.class, Object.class);
+            resultMap = mapper.convertValue(jsonNode, type);
         }
         return resultMap;
     }
@@ -106,4 +124,12 @@ public class JsonUtils {
             throw new SerializationException(String.format("Failed to decode: [%s]", context));
         }
     }
+
+    /**
+     * 使用示例
+     * @param args
+     */
+    /*public static void main(String[] args) {
+        List<BCTUserDTO> result = JsonUtils.fromJson(json, new TypeReference<List<BCTUserDTO>>() {});
+    }*/
 }

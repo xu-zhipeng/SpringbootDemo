@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 public class AopConfig {
 
 
-   /* final WebLogService webLogService;
+    /*final WebLogService webLogService;
 
     @Autowired
     public AopConfig(WebLogService webLogService) {
@@ -40,8 +40,14 @@ public class AopConfig {
         return new WebLogAspectService() {
             @Override
             public Boolean save(WebLog webLog) {
-//                webLog.setUsername(AdminUserDetails.getCurrentUser().getUserId());
-//                return webLogService.save(webLog);
+                /*Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                String userId=null;
+                if(principal instanceof AdminUserDetails){
+                    AdminUserDetails userDetails= (AdminUserDetails) principal;
+                    userId = Optional.ofNullable(userDetails.getUserId()).orElse(null);
+                }
+                webLog.setUsername(userId);
+                return webLogService.save(webLog);*/
                 return true;
             }
         };

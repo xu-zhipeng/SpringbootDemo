@@ -2,14 +2,16 @@ package com.youjun.api.modules.ums.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.youjun.api.modules.ums.dto.UmsAdminParam;
-import com.youjun.api.modules.ums.dto.UpdateAdminPasswordParam;
+import com.youjun.api.modules.ums.param.UmsAdminParam;
+import com.youjun.api.modules.ums.param.UpdateAdminPasswordParam;
 import com.youjun.api.modules.ums.model.UmsAdmin;
 import com.youjun.api.modules.ums.model.UmsResource;
 import com.youjun.api.modules.ums.model.UmsRole;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -17,6 +19,11 @@ import java.util.List;
  * Created by macro on 2018/4/26.
  */
 public interface UmsAdminService extends IService<UmsAdmin> {
+    /**
+     * 获取验证码
+     * @return
+     */
+    ResponseEntity<byte[]> captcha(String captchaId) throws IOException;
     /**
      * 根据用户名获取后台管理员
      */

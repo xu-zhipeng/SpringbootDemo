@@ -10,6 +10,8 @@ spring:
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
+  # 自定义的mybatis typeHandler的包扫描路径
+  type-handlers-package: com.youjun.api.typehandler
   global-config:
     db-config:
       # 主键类型 0: 数据库自增 1 用户输入ID 2 全局唯一ID（数字类型唯一ID） 3 全局唯一ID UUID

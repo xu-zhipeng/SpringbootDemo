@@ -1,4 +1,4 @@
-package com.youjun.api.config;
+package com.youjun.api.components;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * <p>
- *
+ *  socket 封装类
  * </p>
  *
  * @author kirk
@@ -65,6 +65,9 @@ public class CustomWebSocket {
     @OnClose
     public void onClose() {
         webSocketSet.remove(this); // 从set中删除
+        if (webSocketMap.containsKey(userId)) {
+            webSocketMap.remove(userId);
+        }
         subOnlineCount(); // 在线数减1
         log.info("有一连接关闭！当前在线人数为" + getOnlineCount());
     }
@@ -94,7 +97,7 @@ public class CustomWebSocket {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.info("发生错误");
+        log.error("发生错误");
         error.printStackTrace();
     }
 
@@ -111,6 +114,7 @@ public class CustomWebSocket {
             try {
                 item.sendMessage(message);
             } catch (IOException e) {
+                log.error("群发,{{}}信息发送失败",message);
                 continue;
             }
         }
@@ -122,10 +126,14 @@ public class CustomWebSocket {
      */
     public static void sendInfo(String message, String userId) throws IOException {
         log.info("发送消息到：" + userId + "，报文：" + message);
-        if (webSocketMap.containsKey(userId)) {
-            webSocketMap.get(userId).sendMessage(message);
-        } else {
-            log.error("用户" + userId + ",不在线！");
+        try {
+            if (webSocketMap.containsKey(userId)) {
+                webSocketMap.get(userId).sendMessage(message);
+            } else {
+                log.error("用户" + userId + ",不在线！");
+            }
+        }catch (Exception e){
+            log.error("用户：{{}},{{}}信息发送失败",userId,message);
         }
     }
 

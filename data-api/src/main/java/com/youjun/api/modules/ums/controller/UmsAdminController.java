@@ -2,11 +2,11 @@ package com.youjun.api.modules.ums.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.youjun.api.modules.ums.dto.UmsAdminLoginParam;
-import com.youjun.api.modules.ums.dto.UmsAdminParam;
-import com.youjun.api.modules.ums.dto.UpdateAdminPasswordParam;
 import com.youjun.api.modules.ums.model.UmsAdmin;
 import com.youjun.api.modules.ums.model.UmsRole;
+import com.youjun.api.modules.ums.param.UmsAdminLoginParam;
+import com.youjun.api.modules.ums.param.UmsAdminParam;
+import com.youjun.api.modules.ums.param.UpdateAdminPasswordParam;
 import com.youjun.api.modules.ums.service.UmsAdminService;
 import com.youjun.api.modules.ums.service.UmsRoleService;
 import com.youjun.common.api.CommonPage;
@@ -15,6 +15,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +44,17 @@ public class UmsAdminController {
     private UmsAdminService adminService;
     @Autowired
     private UmsRoleService roleService;
+
+    @ApiOperation(value = "验证码")
+    @GetMapping("/captcha")
+    public ResponseEntity<byte[]> captcha(String key) {
+        try {
+            return adminService.captcha(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(CommonResult.failed("验证码请求失败"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @ApiOperation(value = "用户注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)

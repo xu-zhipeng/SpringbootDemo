@@ -6,14 +6,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.code.kaptcha.Producer;
 import com.youjun.api.domain.AdminUserDetails;
-import com.youjun.api.modules.ums.dto.UmsAdminParam;
-import com.youjun.api.modules.ums.dto.UpdateAdminPasswordParam;
+import com.youjun.api.modules.ums.dto.CaptchaDTO;
 import com.youjun.api.modules.ums.mapper.UmsAdminLoginLogMapper;
 import com.youjun.api.modules.ums.mapper.UmsAdminMapper;
 import com.youjun.api.modules.ums.mapper.UmsResourceMapper;
 import com.youjun.api.modules.ums.mapper.UmsRoleMapper;
 import com.youjun.api.modules.ums.model.*;
+import com.youjun.api.modules.ums.param.UmsAdminParam;
+import com.youjun.api.modules.ums.param.UpdateAdminPasswordParam;
+import com.youjun.api.modules.ums.service.CacheService;
 import com.youjun.api.modules.ums.service.UmsAdminCacheService;
 import com.youjun.api.modules.ums.service.UmsAdminRoleRelationService;
 import com.youjun.api.modules.ums.service.UmsAdminService;
@@ -23,6 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +40,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +59,8 @@ public class UmsAdminServiceImpl extends ServiceImpl<UmsAdminMapper, UmsAdmin> i
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
+    private Producer producer;
+    @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UmsAdminLoginLogMapper loginLogMapper;
@@ -60,6 +72,25 @@ public class UmsAdminServiceImpl extends ServiceImpl<UmsAdminMapper, UmsAdmin> i
     private UmsRoleMapper roleMapper;
     @Autowired
     private UmsResourceMapper resourceMapper;
+    @Autowired
+    CacheService cacheService;
+
+    @Override
+    public ResponseEntity<byte[]> captcha(String captchaId) throws IOException {
+        //生成文字验证码
+        String text = producer.createText();
+        //生成图片验证码
+        BufferedImage image = producer.createImage(text);
+        //保存到 session 目前session无法使用 需前端 withCredentials: true
+        //保存到缓存中ehcache 或 redis
+        cacheService.setCapthca(new CaptchaDTO(captchaId, text));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", out);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-store, no-cache");
+        headers.add("Content-Type", "image/jpeg");
+        return new ResponseEntity<byte[]>(out.toByteArray(), headers, HttpStatus.CREATED);
+    }
 
     @Override
     public UmsAdmin getAdminByUsername(String username) {

@@ -3,6 +3,8 @@ server:
   port: 6060
 spring:
   datasource:
+    #1.数据库配置 默认数据连接池是 HikariCP
+    type: com.alibaba.druid.pool.DruidDataSource #使用druid数据源
     # mysql
     url: jdbc:mysql://hzhetundb-dev.mysql.rds.aliyuncs.com:3306/royal_canin?allowMultiQueries=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: hzhetun_dev_team
@@ -14,15 +16,61 @@ spring:
 #    url: jdbc:sqlserver://127.0.0.1:1433;databaseName=HistoryData
 #    username: sa
 #    password: 123456
+    #2.连接池配置
     druid:
+      #初始化连接池的连接数量 大小，最小，最大
       initial-size: 10 #连接池初始化大小
       min-idle: 10 #最小空闲连接数
       max-active: 100 #最大连接数
+      # 配置获取连接等待超时的时间
+      max-wait: 10000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 600000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+      # Oracle需要打开注释
+      #validation-query: SELECT 1 FROM DUAL
+      # true时，如果连接空闲时间超过minEvictableIdleTimeMillis进行检查，否则不检查;false时，不检查
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # 是否缓存preparedStatement，也就是PSCache  官方建议MySQL下建议关闭   个人建议如果想用SQL防火墙 建议打开
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      #      filters: stat,wall,slf4j
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          merge-sql: true
+          slow-sql-millis: 3000
+        slf4j:
+          enabled: true
+          connection-log-enabled: true
+          statement-sql-pretty-format: true
+        wall:
+          config:
+            multi-statement-allow: true
+      #3.基础监控配置
       web-stat-filter:
-        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
-      stat-view-servlet: #访问监控网页的登录用户名和密码
+        enabled: true
+        url-pattern: /*
+        #设置不统计哪些URL
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+        session-stat-enable: false
+        session-stat-max-count: 100
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: true
+        #设置监控页面的登录名和密码
         login-username: druid
         login-password: druid
+        #白名单（如果allow没有配置或者为空，则允许所有访问）
+        #allow: 127.0.0.1
+        #黑名单（deny优先于allow，如果在deny列表中，就算在allow列表中，也会被拒绝）
+        #deny: 192.168.1.100
 
   influx:
     url: http://localhost:8086
@@ -36,6 +84,13 @@ spring:
     port: 6379 # Redis服务器连接端口
     password:  # Redis服务器连接密码（默认为空）
     timeout: 300ms # 连接超时时间（毫秒）
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /
+    username: admin
+    password: admin
 
 logging:
   level:

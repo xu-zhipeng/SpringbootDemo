@@ -362,4 +362,24 @@ INSERT INTO `ums_role_resource_relation` VALUES (213, 8, 27);
 INSERT INTO `ums_role_resource_relation` VALUES (214, 8, 28);
 INSERT INTO `ums_role_resource_relation` VALUES (215, 8, 29);
 
+-- ----------------------------
+-- Table structure for web_log
+-- ----------------------------
+DROP TABLE IF EXISTS `web_log`;
+CREATE TABLE `web_log` (
+  `id` varchar(32) NOT NULL,
+  `description` varchar(255) NULL DEFAULT NULL COMMENT '操作描述',
+  `username` varchar(255) NULL DEFAULT NULL COMMENT '操作用户',
+  `start_time` timestamp(0) NULL DEFAULT NULL COMMENT '操作时间',
+  `spend_time` int(11) NULL DEFAULT NULL COMMENT '消耗时间',
+  `base_path` varchar(255) NULL DEFAULT NULL COMMENT '根路径',
+  `uri` varchar(255) NULL DEFAULT NULL COMMENT 'URI',
+  `url` varchar(255) NULL DEFAULT NULL COMMENT 'URL',
+  `method` varchar(255) NULL DEFAULT NULL COMMENT '请求类型',
+  `ip` varchar(255) NULL DEFAULT NULL COMMENT 'IP地址',
+  `parameter` text NULL DEFAULT NULL COMMENT '请求参数',
+  `result` text NULL DEFAULT NULL COMMENT '返回结果'
+)ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '操作日志表' ROW_FORMAT = Dynamic;
+
+
 SET FOREIGN_KEY_CHECKS = 1;

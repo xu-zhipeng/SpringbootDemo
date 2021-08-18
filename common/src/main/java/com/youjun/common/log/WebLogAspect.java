@@ -2,14 +2,17 @@ package com.youjun.common.log;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
-import cn.hutool.json.JSONUtil;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.youjun.common.api.PageParam;
 import com.youjun.common.domain.WebLog;
 import com.youjun.common.service.WebLogAspectService;
+import com.youjun.common.util.IpAddressUtil;
 import com.youjun.common.util.StringUtils;
 import com.youjun.common.util.TimeUtils;
 import io.swagger.annotations.ApiOperation;
-import net.logstash.logback.marker.Markers;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -19,10 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -43,7 +48,9 @@ import java.util.Map;
 public class WebLogAspect {
     private static final Logger log = LoggerFactory.getLogger(WebLogAspect.class);
 
-    final Gson gson=new Gson();
+    final String[] keys = {"password", "token", "content", "file", "request"};
+
+    final Gson gson = new GsonBuilder().setExclusionStrategies(new JsonIgnoreFields(keys)).create();
 
     final WebLogAspectService webLogAspectService;
 
@@ -52,23 +59,30 @@ public class WebLogAspect {
         this.webLogAspectService = webLogAspectService;
     }
 
-    @Pointcut("@annotation(com.youjun.common.log.Log)")
-    public void log() {
+    @Pointcut("@annotation(com.youjun.common.log.MethodLog)")
+    public void annotationLog() {
     }
 
-    @Pointcut("execution(public * com.youjun..controller.*.*(..))")
-    public void webLog() {
+    /**
+     * 切面日志 暂时关闭
+     */
+    /*@Pointcut("execution(public * com.youjun..controller.*.*(..)) " +
+            "&& !execution(public * com.youjun..controller.UmsAdminController.captcha(..))" +
+            "&& !execution(public * com.youjun..controller.WebLogController.*(..))"
+    )*/
+    @Pointcut("execution(public * com.youjun..close.*.*(..))")
+    public void aopLog() {
     }
 
-    @Before("webLog() || log()")
+    @Before("aopLog() || annotationLog()")
     public void doBefore(JoinPoint joinPoint) {
     }
 
-    @AfterReturning(value = "webLog() || log()", returning = "ret")
+    @AfterReturning(value = "aopLog() || annotationLog()", returning = "ret")
     public void doAfterReturning(Object ret) {
     }
 
-    @Around("webLog() || log()")
+    @Around("aopLog() || annotationLog()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         //获取当前请求对象
@@ -87,11 +101,24 @@ public class WebLogAspect {
         long endTime = System.currentTimeMillis();
         String urlStr = request.getRequestURL().toString();
         webLog.setBasePath(StrUtil.removeSuffix(urlStr, URLUtil.url(urlStr).getPath()));
-        webLog.setIp(request.getRemoteAddr());
+        webLog.setIp(IpAddressUtil.getIpAddress(request));
         webLog.setMethod(request.getMethod());
-        Object parameter = getParameter(method, joinPoint.getArgs());
-        webLog.setParameter(gson.toJson(parameter));
-        webLog.setResult(gson.toJson(result));
+        try {
+            String parameter = getParameter(method, joinPoint.getArgs());
+            webLog.setParameter(parameter);
+        } catch (Exception e) {
+            log.error("gson解析错误,uri={}", request.getRequestURI());
+            webLog.setParameter("{\"errorMessage\":\"gson解析错误\"}");
+            e.printStackTrace();
+        }
+        try {
+            String response = getResponse(result);
+            webLog.setResult(response);
+        } catch (Exception e) {
+            log.error("gson解析错误,uri={}", request.getRequestURI());
+            webLog.setResult("{\"errorMessage\":\"gson解析错误\"}");
+            e.printStackTrace();
+        }
         webLog.setSpendTime((int) (endTime - startTime));
         webLog.setStartTime(TimeUtils.timestampToDateTime(startTime));
         webLog.setUri(request.getRequestURI());
@@ -103,7 +130,7 @@ public class WebLogAspect {
         logMap.put("spendTime", webLog.getSpendTime());
         logMap.put("description", webLog.getDescription());
         //LOGGER.info("{}", JSONUtil.parse(webLog));
-        log.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
+//        log.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
         webLogAspectService.save(webLog);
         return result;
     }
@@ -111,7 +138,7 @@ public class WebLogAspect {
     /**
      * 根据方法和传入的参数获取请求参数
      */
-    private Object getParameter(Method method, Object[] args) {
+    private String getParameter(Method method, Object[] args) {
         List<Object> argList = new ArrayList<>();
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
@@ -129,19 +156,86 @@ public class WebLogAspect {
                 if (StringUtils.isNotBlank(requestParam.value())) {
                     key = requestParam.value();
                 }
-                map.put(key, args[i]);
+                Object value = args[i];
+                //如果是文件对象
+                if (value instanceof MultipartFile[]) {
+                    List<String> list = new ArrayList<>();
+                    MultipartFile[] multipartFiles = (MultipartFile[]) value;
+                    for (MultipartFile file : multipartFiles) {
+                        list.add(file.getOriginalFilename());   //获取文件名
+                    }
+                    value = list;
+                } else if (value instanceof MultipartFile) {
+                    MultipartFile file = (MultipartFile) value;
+                    value = file.getOriginalFilename();  //获取文件名
+                }
+                map.put(key, value);
                 argList.add(map);
                 continue;
             }
-            //都不是
-            argList.add(args[i]);
+            //将MethodArgLog 自定义注解修饰的参数作为请求参数
+            MethodArgLog methodArgLog = parameters[i].getAnnotation(MethodArgLog.class);
+            if (methodArgLog != null && methodArgLog.required()) {
+                argList.add(args[i]);
+                continue;
+            }
+            //如果是分页请求
+            if (args[i] instanceof PageParam) {
+                argList.add(args[i]);
+                continue;
+            }
+            //都不是 结束
         }
         if (argList.size() == 0) {
             return null;
         } else if (argList.size() == 1) {
-            return argList.get(0);
+            return gson.toJson(argList.get(0));
         } else {
-            return argList;
+            return gson.toJson(argList);
         }
     }
+
+    /**
+     * 将返回值进行转换 json
+     *
+     * @param result
+     * @return
+     */
+    private String getResponse(Object result) {
+        //如果是文件对象
+        if (result instanceof ResponseEntity) {
+            result = "文件流对象";
+        }
+        return gson.toJson(result);
+    }
+}
+
+/**
+ * Gson序列化对象排除属性
+ * 调用方法：
+ * String[] keys = { "id" };
+ * Gson gson = new GsonBuilder().setExclusionStrategies(new JsonKit(keys)).create();
+ */
+class JsonIgnoreFields implements ExclusionStrategy {
+    String[] keys;
+
+    public JsonIgnoreFields(String[] keys) {
+        this.keys = keys;
+    }
+
+    @Override
+    public boolean shouldSkipClass(Class<?> arg0) {
+        return false;
+    }
+
+    @Override
+    public boolean shouldSkipField(FieldAttributes arg0) {
+        for (String key : keys) {
+            if (key.equals(arg0.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

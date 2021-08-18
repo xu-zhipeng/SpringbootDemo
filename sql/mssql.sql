@@ -801,3 +801,30 @@ GO
 INSERT INTO [dbo].[ums_role_resource_relation] ([id], [role_id], [resource_id]) VALUES (N'215', N'8', N'29')
 GO
 
+
+-- ----------------------------
+-- Table structure for ums_role_resource_relation
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[web_log]') AND type IN ('U'))
+	DROP TABLE [dbo].[web_log]
+GO
+
+CREATE TABLE [dbo].[web_log] (
+  [id] nvarchar(32) NOT NULL,
+  [description] nvarchar(255) NULL,
+  [username] nvarchar(255) NULL,
+  [start_time] datetime2(7) NULL,
+  [spend_time] int NULL,
+  [base_path] nvarchar(255) NULL,
+  [uri] nvarchar(255) NULL,
+  [url] nvarchar(255) NULL,
+  [method] nvarchar(255) NULL,
+  [ip] nvarchar(255) NULL,
+  [parameter] text NULL,
+  [result] text NULL
+)
+GO
+
+ALTER TABLE [dbo].[web_log] SET (LOCK_ESCALATION = TABLE)
+GO
+

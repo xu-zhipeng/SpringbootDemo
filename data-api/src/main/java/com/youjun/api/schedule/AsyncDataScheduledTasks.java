@@ -22,7 +22,7 @@ public class AsyncDataScheduledTasks {
 
     @Async
     @Scheduled(cron = "*/5 * * * * ?")
-    public void carTrackDataSync() {
+    public void carTrackDataAsync() {
         try {
             ApiDataDownloadRunnable apiDataDownloadRunnable = new ApiDataDownloadRunnable();
             threadPool.submit(apiDataDownloadRunnable);

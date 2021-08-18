@@ -1,4 +1,4 @@
-package com.youjun.api.modules.ums.dto;
+package com.youjun.api.modules.ums.param;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
