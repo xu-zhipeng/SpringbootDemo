@@ -50,27 +50,22 @@ public class FileUtils {
             }
         }
         //删除
-        file.delete();
+        if (!file.delete()) {
+            throw new RuntimeException(String.format("删除文件[%s]失败", file.getAbsolutePath()));
+        }
     }
 
     public static File createFile(String path) {
         File file = new File(path);
-        if (file.exists()) {
-            if (!file.delete()) {
-                throw new RuntimeException("file is exists and delete fail");
-            }
+        if (file.exists() && !file.delete()) {
+            throw new RuntimeException("file is exists and delete fail");
         }
-        if (path.endsWith(File.separator)) {
-            if (!file.mkdirs()) {
-                throw new RuntimeException("upper folder create fail");
-            }
+        if (path.endsWith(File.separator) && !file.mkdirs()) {
+            throw new RuntimeException("upper folder create fail");
         }
-        //判断目标文件所在的目录是否存在
-        if (!file.getParentFile().exists()) {
-            //如果目标文件所在的目录不存在，则创建父目录
-            if (!file.getParentFile().mkdirs()) {
-                throw new RuntimeException("upper folder create fail");
-            }
+        //判断目标文件所在的目录是否存在 如果目标文件所在的目录不存在，则创建父目录
+        if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+            throw new RuntimeException("upper folder create fail");
         }
         //创建目标文件
         try {
@@ -98,29 +93,29 @@ public class FileUtils {
         } else {
             if (!file.exists()) {
                 boolean mkdirs = file.mkdirs();
-                if(!mkdirs){
+                if (!mkdirs) {
                     log.error("FileUtils mkdir error");
                 }
             }
             return file;
         }
     }
+
     public static String readString(String path, Charset charset) {
-        StringBuffer stringBuffer = new StringBuffer();
-        try {
-            FileInputStream in = new FileInputStream(path);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in,charset));
+        StringBuilder stringBuilder = new StringBuilder();
+        try (
+                FileInputStream in = new FileInputStream(path);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, charset));
+        ) {
             String str = null;
             while ((str = bufferedReader.readLine()) != null) {
-                stringBuffer.append(str);
+                stringBuilder.append(str);
             }
-            in.close();
-            bufferedReader.close();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             log.error("读取文件错误");
             e.printStackTrace();
         }
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
     public static byte[] readBytes(String path) {
@@ -133,44 +128,43 @@ public class FileUtils {
     }
 
     public static byte[] readBytes(File file) {
-        try {
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (
+                BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ) {
             byte[] bytes = new byte[1024];
             int len = -1;
             while ((len = in.read(bytes)) != -1) {
                 out.write(bytes, 0, len);
             }
-            out.close();
-            in.close();
             return out.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
             log.error("FileUtils readBytes error");
         }
-        return null;
+        return new byte[]{};
     }
 
     public static byte[] readBytes(InputStream in) {
-        try {
+        try (
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ) {
             if (Objects.isNull(in)) {
                 log.error("inputStream is null.");
                 throw new RuntimeException("inputStream is null.");
             }
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] bytes = new byte[1024];
             int len = -1;
             while ((len = in.read(bytes)) != -1) {
                 out.write(bytes, 0, len);
             }
-            out.close();
             in.close();
             return out.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("FileUtils readBytes error,message:{}",e.getMessage());
+            log.error("FileUtils readBytes error,message:{}", e.getMessage());
         }
-        return null;
+        return new byte[]{};
     }
 
     public static File writeBytes(byte[] bytes, String path) {
@@ -178,38 +172,30 @@ public class FileUtils {
     }
 
     public static File writeBytes(byte[] bytes, File file) {
-        BufferedOutputStream bos = null;
-        try {
+        try (
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        ) {
             if (Objects.isNull(file) || file.isDirectory()) {
                 log.error("file is null or directorty.");
                 throw new RuntimeException("file is null or directorty.");
             }
-            bos = new BufferedOutputStream(new FileOutputStream(file));
             bos.write(bytes);
             bos.flush();
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
-        } finally {
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (IOException e1) {
-                    log.error(e1.getMessage());
-                    e1.printStackTrace();
-                }
-            }
         }
         return file;
     }
 
     public static File writeBytes(InputStream in, String path) {
-        return writeBytes(in,createFile(path));
+        return writeBytes(in, createFile(path));
     }
 
     public static File writeBytes(InputStream in, File file) {
-        BufferedOutputStream bos = null;
-        try {
+        try (
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        ) {
             if (Objects.isNull(in)) {
                 log.error("inputStream is null.");
                 throw new RuntimeException("inputStream is null.");
@@ -218,28 +204,20 @@ public class FileUtils {
                 log.error("file is null or directorty.");
                 throw new RuntimeException("file is null or directorty.");
             }
-            bos = new BufferedOutputStream(new FileOutputStream(file));
             bos.write(readBytes(in));
             bos.flush();
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
-        } finally {
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (IOException e1) {
-                    log.error(e1.getMessage());
-                    e1.printStackTrace();
-                }
-            }
         }
         return file;
     }
 
     public static void copyFile(String sourcePath, String destPath) {
-        try (FileChannel inputChannel = new FileInputStream(sourcePath).getChannel();
-             FileChannel outputChannel = new FileOutputStream(destPath).getChannel();) {
+        try (
+                FileChannel inputChannel = new FileInputStream(sourcePath).getChannel();
+                FileChannel outputChannel = new FileOutputStream(destPath).getChannel();
+        ) {
             outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
         } catch (FileNotFoundException e) {
             throw new RuntimeException("找不到文件" + e.getMessage());

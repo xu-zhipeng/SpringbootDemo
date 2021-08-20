@@ -95,8 +95,8 @@ public class WebLogAspect {
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
         if (method.isAnnotationPresent(ApiOperation.class)) {
-            ApiOperation log = method.getAnnotation(ApiOperation.class);
-            webLog.setDescription(log.value());
+            ApiOperation apiOperation = method.getAnnotation(ApiOperation.class);
+            webLog.setDescription(apiOperation.value());
         }
         long endTime = System.currentTimeMillis();
         String urlStr = request.getRequestURL().toString();
@@ -186,7 +186,7 @@ public class WebLogAspect {
             }
             //都不是 结束
         }
-        if (argList.size() == 0) {
+        if (argList.isEmpty()) {
             return null;
         } else if (argList.size() == 1) {
             return gson.toJson(argList.get(0));

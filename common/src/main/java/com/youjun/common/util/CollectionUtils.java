@@ -7,13 +7,15 @@ import java.util.Map;
 
 /**
  * <p>
- *  集合工具类
+ * 集合工具类
  * </p>
  *
  * @author kirk
  * @since 2021/4/12
  */
 public class CollectionUtils {
+    private CollectionUtils() {
+    }
 
     public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
@@ -31,13 +33,14 @@ public class CollectionUtils {
         return null == iterable || isEmpty(iterable.iterator());
     }
 
-    public static boolean isEmpty(Iterator<?> Iterator) {
-        return null == Iterator || !Iterator.hasNext();
+    public static boolean isEmpty(Iterator<?> iterator) {
+        return null == iterator || !iterator.hasNext();
     }
 
     public static boolean isEmpty(Enumeration<?> enumeration) {
         return null == enumeration || !enumeration.hasMoreElements();
     }
+
 
     public static boolean isNotEmpty(Collection<?> collection) {
         return !isEmpty(collection);
@@ -51,8 +54,8 @@ public class CollectionUtils {
         return null != iterable && isNotEmpty(iterable.iterator());
     }
 
-    public static boolean isNotEmpty(Iterator<?> Iterator) {
-        return null != Iterator && Iterator.hasNext();
+    public static boolean isNotEmpty(Iterator<?> iterator) {
+        return null != iterator && iterator.hasNext();
     }
 
     public static boolean isNotEmpty(Enumeration<?> enumeration) {

@@ -7,21 +7,24 @@ import java.util.Objects;
 
 /**
  * <p>
- *  计算程序运行时间工具类
+ * 计算程序运行时间工具类
  * </p>
  *
  * @author kirk
  * @since 2021/6/9
  */
 public class CalculateTimeUtils {
-    private static final Logger log = LoggerFactory.getLogger(CollectionUtils.class);
+    private CalculateTimeUtils() {
+    }
 
-    public static volatile Long startTime;
-    public static volatile Long endTime;
+    private static final Logger log = LoggerFactory.getLogger(CalculateTimeUtils.class);
 
-    public static void startTime() {
-        startTime=System.currentTimeMillis();
-        endTime=System.currentTimeMillis();
+    private static volatile Long startTime;
+    private static volatile Long endTime;
+
+    public static void start() {
+        startTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
         log.info("开始计时");
     }
 

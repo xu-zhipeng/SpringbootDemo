@@ -2,7 +2,6 @@ package com.youjun.common.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -11,8 +10,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.youjun.common.exception.ApiException;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 
 import javax.validation.constraints.NotNull;
@@ -98,7 +97,7 @@ public class BaseDateConfig {
                 try {
                     return format.parse(source);
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    throw new ApiException("Data 转换失败");
                 }
             }
         };
@@ -134,13 +133,13 @@ public class BaseDateConfig {
         });
         javaTimeModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
             @Override
-            public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+            public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
                 SimpleDateFormat format = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
                 String date = jsonParser.getText();
                 try {
                     return format.parse(date);
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    throw new ApiException("Data 转换失败");
                 }
             }
         });

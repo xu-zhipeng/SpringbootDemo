@@ -10,6 +10,9 @@ package com.youjun.common.util;
  * @since 2021/4/15
  */
 public class StringUtils {
+    private StringUtils() {
+    }
+
     public static boolean isBlank(CharSequence str) {
         int length;
         if (str != null && (length = str.length()) != 0) {

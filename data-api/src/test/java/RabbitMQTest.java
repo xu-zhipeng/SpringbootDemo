@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.youjun.api.DataApiApplication;
 import com.youjun.api.modules.office.controller.dto.BctDataDTO;
 import com.youjun.common.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import java.util.HashMap;
  * @since 2021/8/7
  */
 @Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = DataApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class RabbitMQTest {
     @Autowired

@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class JsonUtils {
+    private JsonUtils() {
+    }
+
     public static class SerializationException extends RuntimeException{
         SerializationException(String message) {
             super(message);
