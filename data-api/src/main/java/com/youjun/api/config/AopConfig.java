@@ -1,7 +1,7 @@
 package com.youjun.api.config;
 
 import com.youjun.common.domain.WebLog;
-import com.youjun.common.log.WebLogAspect;
+import com.youjun.common.aspect.WebLogAspect;
 import com.youjun.common.service.WebLogAspectService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

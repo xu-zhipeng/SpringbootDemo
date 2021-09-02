@@ -7,6 +7,16 @@ spring:
     multipart:
       enabled: true #开启文件上传
       max-file-size: 10MB #限制文件上传大小为10M
+  #MQ消息队列
+  rabbitmq:
+    # 消息确认（ACK）
+    publisher-confirm-type: correlated #确认消息已发送到交换机(Exchange)
+    publisher-returns: true #确认消息已发送到队列(Queue)
+    listener: #加了2下面2个属性,消费消息的时候,就必须发送ack确认,不然消息永远还在队列中
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml

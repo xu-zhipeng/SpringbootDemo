@@ -1,4 +1,4 @@
-package com.youjun.common.log;
+package com.youjun.common.aspect;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.youjun.common.api.PageParam;
 import com.youjun.common.domain.WebLog;
+import com.youjun.common.log.MethodArgLog;
 import com.youjun.common.service.WebLogAspectService;
 import com.youjun.common.util.IpAddressUtil;
 import com.youjun.common.util.StringUtils;
