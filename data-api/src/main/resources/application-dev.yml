@@ -93,6 +93,41 @@ spring:
     username: admin
     password: admin
 
+  quartz:
+    # quartz db schema
+    job-store-type: jdbc
+    #quartz第一次启动时需要初始化，使用always，之后使用never
+    #jdbc.initialize-schema=never
+    jdbc.initialize-schema: always
+#    auto-startup: true
+#    startup-delay: 30s
+#    #quartz参数
+#    properties:
+#      org:
+#        quartz:
+#          scheduler:
+#            instanceName: SubmissionScheduler
+#            instanceId: AUTO
+#          #JobStore配置
+#          jobStore:
+#            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+#            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+#            tablePrefix: QRTZ_
+#            isClustered: true
+#            clusterCheckinInterval: 15000
+#            maxMisfiresToHandleAtATime: 1
+#            useProperties: false
+#            dataSource: quartz
+#            misfireThreshold: 12000
+#            selectWithLockSQL: 'SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?'
+#          #线程池配置
+#          threadPool:
+#            class: org.quartz.simpl.SimpleThreadPool
+#            threadCount: 20
+#            threadPriority: 5
+#            threadsInheritContextClassLoaderOfInitializingThread: true
+
+
 logging:
   level:
     root: info

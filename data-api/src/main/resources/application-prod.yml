@@ -35,6 +35,13 @@ spring:
     username: admin
     password: admin
 
+  quartz:
+    # quartz db schema
+    job-store-type: jdbc
+    #quartz第一次启动时需要初始化，使用always，之后使用never
+    #jdbc.initialize-schema=never
+    jdbc.initialize-schema: always
+
 logging:
   level:
     root: info
