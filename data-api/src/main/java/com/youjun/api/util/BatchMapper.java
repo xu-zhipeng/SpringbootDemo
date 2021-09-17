@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
@@ -36,15 +38,66 @@ import java.util.function.Consumer;
  * @since 2021/7/8
  */
 public interface BatchMapper<T> extends BaseMapper<T> {
-    Logger log = LoggerFactory.getLogger(BatchMapper.class);
+    Logger logger = LoggerFactory.getLogger(BatchMapper.class);
 
     /**
-     * 获取T的class
+     * 通过反射获取T的class
      *
      * @return
      */
     default Class<T> entityClass() {
-        return (Class<T>) ReflectionKit.getSuperClassGenericType(this.getClass(), 1);
+        return (Class<T>) getInterfacesGenericType(this.getClass(), 0);
+    }
+
+    default Class<?> getSuperClassGenericType(final Class<?> clazz, final int index) {
+        Type genType = clazz.getGenericSuperclass();
+        if (!(genType instanceof ParameterizedType)) {
+            logger.warn(String.format("Warn: %s's superclass not ParameterizedType", clazz.getSimpleName()));
+            return Object.class;
+        } else {
+            Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+            if (index < params.length && index >= 0) {
+                if (!(params[index] instanceof Class)) {
+                    logger.warn(String.format("Warn: %s not set the actual class on superclass generic parameter", clazz.getSimpleName()));
+                    return Object.class;
+                } else {
+                    return (Class) params[index];
+                }
+            } else {
+                logger.warn(String.format("Warn: Index: %s, Size of %s's Parameterized Type: %s .", index, clazz.getSimpleName(), params.length));
+                return Object.class;
+            }
+        }
+    }
+
+    default Class<?> getInterfacesGenericType(final Class<?> clazz, final int index) {
+        Type[] interfaces = clazz.getGenericInterfaces();
+        if (interfaces.length == 0) {
+            logger.warn(String.format("Warn: %s not implements interface ", clazz.getSimpleName()));
+            return Object.class;
+        }
+        if (index >= interfaces.length || index < 0) {
+            logger.warn(String.format("Warn: index less than 0 or greater than interfaces.length %s", interfaces.length));
+            return Object.class;
+        }
+        Type genType = interfaces[index];
+        if (!(genType instanceof ParameterizedType)) {
+            //获取实现接口的类型 如果不是ParameterizedType 则获取父接口
+            return getInterfacesGenericType((Class<?>) genType, index);
+        } else {
+            Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+            if (index < params.length && index >= 0) {
+                if (!(params[index] instanceof Class)) {
+                    logger.warn(String.format("Warn: %s not set the actual class on superclass generic parameter", clazz.getSimpleName()));
+                    return Object.class;
+                } else {
+                    return (Class) params[index];
+                }
+            } else {
+                logger.warn(String.format("Warn: Index: %s, Size of %s's Parameterized Type: %s .", index, clazz.getSimpleName(), params.length));
+                return Object.class;
+            }
+        }
     }
 
     /*********************** IService **************************/
@@ -142,7 +195,7 @@ public interface BatchMapper<T> extends BaseMapper<T> {
 
         sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
         if (!transaction) {
-            log.warn("SqlSession [" + sqlSession + "] was not registered for synchronization because DataSource is not transactional");
+            logger.warn("SqlSession [" + sqlSession + "] was not registered for synchronization because DataSource is not transactional");
         }
 
         boolean var6;
