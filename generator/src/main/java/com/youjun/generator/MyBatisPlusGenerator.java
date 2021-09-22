@@ -19,7 +19,7 @@ import java.util.Scanner;
 
 /**
  * MyBatisPlus代码生成器
- * Created by macro on 2020/8/20.
+ * Created on 2020/8/20.
  */
 public class MyBatisPlusGenerator {
 

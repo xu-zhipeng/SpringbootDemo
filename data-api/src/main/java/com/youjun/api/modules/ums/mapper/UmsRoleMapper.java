@@ -11,7 +11,7 @@ import java.util.List;
  * 后台用户角色表 Mapper 接口
  * </p>
  *
- * @author macro
+ * @author kirk
  * @since 2020-08-21
  */
 public interface UmsRoleMapper extends BaseMapper<UmsRole> {

@@ -16,7 +16,7 @@ import java.util.Date;
  * 后台用户角色表
  * </p>
  *
- * @author macro
+ * @author kirk
  * @since 2020-08-21
  */
 @Data

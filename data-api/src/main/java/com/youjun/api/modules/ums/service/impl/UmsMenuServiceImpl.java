@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * 后台菜单管理Service实现类
- * Created by macro on 2020/2/2.
+ * Created on 2020/2/2.
  */
 @Service
 public class UmsMenuServiceImpl extends ServiceImpl<UmsMenuMapper, UmsMenu>implements UmsMenuService {

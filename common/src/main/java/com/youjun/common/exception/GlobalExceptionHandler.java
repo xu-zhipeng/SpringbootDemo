@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 /**
  * 全局异常处理
- * Created by macro on 2020/2/27.
+ * Created on 2020/2/27.
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {

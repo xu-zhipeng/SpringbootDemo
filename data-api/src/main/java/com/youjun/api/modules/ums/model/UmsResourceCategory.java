@@ -16,7 +16,7 @@ import java.util.Date;
  * 资源分类表
  * </p>
  *
- * @author macro
+ * @author kirk
  * @since 2020-08-21
  */
 @Data

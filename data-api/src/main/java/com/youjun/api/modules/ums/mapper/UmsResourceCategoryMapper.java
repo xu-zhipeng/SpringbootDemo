@@ -8,7 +8,7 @@ import com.youjun.api.modules.ums.model.UmsResourceCategory;
  * 资源分类表 Mapper 接口
  * </p>
  *
- * @author macro
+ * @author kirk
  * @since 2020-08-21
  */
 public interface UmsResourceCategoryMapper extends BaseMapper<UmsResourceCategory> {

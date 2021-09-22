@@ -15,7 +15,7 @@ import java.io.Serializable;
  * 后台角色菜单关系表
  * </p>
  *
- * @author macro
+ * @author kirk
  * @since 2020-08-21
  */
 @Data

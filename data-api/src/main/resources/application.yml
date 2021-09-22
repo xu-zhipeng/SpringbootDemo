@@ -28,6 +28,10 @@ mybatis-plus:
       id-type: auto
       # 字段策略 0 忽略判断 1 非 null判断 2 非空判断
       field-strategy: not_empty
+      # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置 @TableLogic注解)
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
   configuration:
     #默认是PARTIAL，只会自动映射没有定义嵌套结果集映射的结果集,FULL 会自动映射任意复杂的结果集（包括嵌套其他情况），NONE 取消自动映射
     auto-mapping-behavior: partial
@@ -75,7 +79,7 @@ aliyun:
     endpoint: oss-cn-shenzhen.aliyuncs.com # oss对外服务的访问域名
     accessKeyId: test # 访问身份验证中用到用户标识
     accessKeySecret: test # 用户用于加密签名字符串和oss用来验证签名字符串的密钥
-    bucketName: macro-oss # oss的存储空间
+    bucketName: kirk-oss # oss的存储空间
     policy:
       expire: 300 # 签名有效期(S)
     maxSize: 10 # 上传文件大小(M)
