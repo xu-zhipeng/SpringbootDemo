@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -98,9 +99,12 @@ public class MyBatisConfig {
              * @return
              */
             public String getUserName() {
-                Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                Object principal = Optional.ofNullable(SecurityContextHolder.getContext())
+                        .map(v -> v.getAuthentication())
+                        .map(v -> v.getPrincipal())
+                        .orElse(null);
                 String username = null;
-                if (principal instanceof AdminUserDetails) {
+                if (Objects.nonNull(principal) && principal instanceof AdminUserDetails) {
                     AdminUserDetails userDetails = (AdminUserDetails) principal;
                     username = Optional.ofNullable(userDetails.getUsername()).orElse(null);
                 }

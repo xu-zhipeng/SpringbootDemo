@@ -33,7 +33,7 @@ public class ScheduleJob implements Serializable {
 	 * 任务id
 	 */
 	@ApiModelProperty(value = "主键")
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	@TableId(value = "id", type = IdType.AUTO)
 	private String id;
 
 	/**

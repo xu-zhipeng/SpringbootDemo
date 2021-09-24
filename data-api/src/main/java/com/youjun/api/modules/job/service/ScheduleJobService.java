@@ -48,4 +48,9 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 	 * 恢复运行
 	 */
 	void resume(String[] jobIds);
+
+	/**
+	 * 立即执行(同步)
+	 */
+	void syncRun(String[] jobIds);
 }

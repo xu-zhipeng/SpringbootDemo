@@ -10,12 +10,18 @@ import com.youjun.api.modules.job.enums.ScheduleStatus;
 import com.youjun.api.modules.job.mapper.ScheduleJobMapper;
 import com.youjun.api.modules.job.model.ScheduleJob;
 import com.youjun.api.modules.job.param.ScheduleJobPageParam;
+import com.youjun.api.modules.job.service.ScheduleJobLogService;
 import com.youjun.api.modules.job.service.ScheduleJobService;
+import com.youjun.api.modules.job.utils.ScheduleJobExcute;
 import com.youjun.api.modules.job.utils.ScheduleUtils;
+import com.youjun.common.exception.ApiException;
 import com.youjun.common.util.CollectionUtils;
+import com.youjun.common.util.JsonUtils;
 import com.youjun.common.util.StringUtils;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 @Service("scheduleJobService")
@@ -30,19 +37,31 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     @Autowired
     private Scheduler scheduler;
 
+    @Autowired
+    private ScheduleJobLogService scheduleJobLogService;
+
+    private Logger log = LoggerFactory.getLogger(getClass());
+
     /**
      * 项目启动时，初始化定时器
      */
     @PostConstruct
     public void init() {
         List<ScheduleJob> scheduleJobList = this.list();
+        log.info("项目启动,初始化定时器");
         for (ScheduleJob scheduleJob : scheduleJobList) {
-            CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob.getId());
-            //如果不存在，则创建
-            if (cronTrigger == null) {
-                ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
-            } else {
-                ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
+            try {
+                CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob.getId());
+                // 如果不存在，则创建
+                if (cronTrigger == null) {
+                    log.info("创建定时器,trigger_name:TASK_{},BeanName:{}",scheduleJob.getId(),scheduleJob.getBeanName());
+                    ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
+                } else {
+                    log.info("更新定时器,trigger_name:TASK_{},BeanName:{}",scheduleJob.getId(),scheduleJob.getBeanName());
+                    ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
+                }
+            } catch (Exception ex) {
+                log.error("初始化job异常", ex);
             }
         }
     }
@@ -52,7 +71,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         Page<ScheduleJob> page = new Page<>(params.getCurrent(), params.getPageSize());
         return this.baseMapper.selectPage(page, new QueryWrapper<ScheduleJob>().lambda()
                 .eq(StringUtils.isNotBlank(params.getBeanName()), ScheduleJob::getBeanName, params.getBeanName())
-				.orderByAsc(ScheduleJob::getBeanName)
+                .orderByAsc(ScheduleJob::getBeanName)
         );
     }
 
@@ -60,26 +79,34 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveJob(ScheduleJob scheduleJob) {
-        scheduleJob.setCreatedDt(LocalDateTime.now());
-        scheduleJob.setStatus(ScheduleStatus.NORMAL.getValue());
+        try {
+            scheduleJob.setStatus(scheduleJob.getStatus());
+            scheduleJob.setCreatedDt(LocalDateTime.now());
+            scheduleJob.setCreatedBy(AdminUserDetails.getCurrentUser().getUserId());
+            scheduleJob.setModifiedDt(LocalDateTime.now());
+            scheduleJob.setModifiedBy(AdminUserDetails.getCurrentUser().getUserId());
+            this.save(scheduleJob);
 
-        scheduleJob.setCreatedDt(LocalDateTime.now());
-        scheduleJob.setCreatedBy(AdminUserDetails.getCurrentUser().getUserId());
-        scheduleJob.setModifiedDt(LocalDateTime.now());
-        scheduleJob.setModifiedBy(AdminUserDetails.getCurrentUser().getUserId());
-        this.save(scheduleJob);
-
-        ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
+            ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
+        } catch (Exception e) {
+            log.error("保存定时任务失败", e);
+            throw new ApiException(e.getMessage());
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(ScheduleJob scheduleJob) {
-        ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
+        try {
+            ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
 
-        scheduleJob.setModifiedDt(LocalDateTime.now());
-        scheduleJob.setModifiedBy(AdminUserDetails.getCurrentUser().getUserId());
-        this.updateById(scheduleJob);
+            scheduleJob.setModifiedDt(LocalDateTime.now());
+            scheduleJob.setModifiedBy(AdminUserDetails.getCurrentUser().getUserId());
+            this.updateById(scheduleJob);
+        } catch (Exception e) {
+            log.error("更新定时任务失败", e);
+            throw new ApiException(e.getMessage());
+        }
     }
 
     @Override
@@ -134,6 +161,24 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         }
 
         updateBatch(jobIds, ScheduleStatus.NORMAL.getValue());
+    }
+
+    @Override
+    public void syncRun(String[] jobIds) {
+        HashMap<String, String> errorMap = new HashMap<>();
+        for (String jobId : jobIds) {
+            ScheduleJob scheduleJob = this.getById(jobId);
+            ScheduleJobExcute scheduleJobExcute = new ScheduleJobExcute();
+            try {
+                scheduleJobExcute.executeInternal(scheduleJob);
+            } catch (Exception e) {
+                log.error("同步执行失败");
+                errorMap.put(scheduleJob.getBeanName(),e.getMessage());
+            }
+        }
+        if(CollectionUtils.isNotEmpty(errorMap)){
+            throw new ApiException(JsonUtils.toJson(errorMap));
+        }
     }
 
 }

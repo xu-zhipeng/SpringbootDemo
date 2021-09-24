@@ -12,7 +12,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -70,13 +73,26 @@ public class ScheduleJobController {
     }
 
     @MethodLog()
-    @ApiOperation("立即执行任务")
+    @ApiOperation("立即执行任务(异步执行)")
     @PostMapping("/run")
     public CommonResult run(@RequestBody String[] jobIds) {
         if(CollectionUtils.isEmpty(jobIds)){
             return CommonResult.failed();
         }
         scheduleJobService.run(jobIds);
+
+        return CommonResult.success(null);
+    }
+
+
+    @MethodLog()
+    @ApiOperation("立即执行任务(同步执行)")
+    @PostMapping("/syncRun")
+    public CommonResult syncRun(@RequestBody String[] jobIds) {
+        if(CollectionUtils.isEmpty(jobIds)){
+            return CommonResult.failed();
+        }
+        scheduleJobService.syncRun(jobIds);
 
         return CommonResult.success(null);
     }
