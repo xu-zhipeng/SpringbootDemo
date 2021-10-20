@@ -188,13 +188,17 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+            </plugin>
             <!-- swagger接口导出与 打包为markup插件
-           使用方式：
-               0：确认系统的 /v2/api-docs 接口可用;
-               1：修改configuration.swaggerInput 标签内容，地址改为：http://localhost:6060/v2/api-docs 修改为当前项目可访问路径(0步);
-               2：运行当前项目;
-               3：进入项目根目录,执行mvn命令：mvn swagger2markup:convertSwagger2markup;
-           -->
+            使用方式：
+                0：确认系统的 /v2/api-docs 接口可用;
+                1：修改configuration.swaggerInput 标签内容，地址改为：http://localhost:6060/v2/api-docs 修改为当前项目可访问路径(0步);
+                2：运行当前项目;
+                3：进入项目根目录,执行mvn命令：mvn swagger2markup:convertSwagger2markup;
+            -->
             <!--<plugin>
                 <groupId>io.github.swagger2markup</groupId>
                 <artifactId>swagger2markup-maven-plugin</artifactId>

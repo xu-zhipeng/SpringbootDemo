@@ -29,8 +29,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
-        <docker.host>http://192.168.3.101:2375</docker.host>
-        <docker.maven.plugin.version>1.2.2</docker.maven.plugin.version>
+        <docker.image.prefix>1.117.230.132:5000</docker.image.prefix>
+        <dockerfile.maven.plugin.version>1.4.10</dockerfile.maven.plugin.version>
         <druid.version>1.1.23</druid.version>
         <hutool.version>5.6.2</hutool.version>
         <guava.version>30.1.1-jre</guava.version>
@@ -302,37 +302,44 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                 </plugin>
-                <!--<plugin>
+                <!-- 这个配置 需要本地有docker环境,默认https传输,http 需要配置 {"insecure-registries" : ["1.117.230.132:5000"]}-->
+                <plugin>
                     <groupId>com.spotify</groupId>
-                    <artifactId>docker-maven-plugin</artifactId>
-                    <version>${docker.maven.plugin.version}</version>
-                    &lt;!&ndash;<executions>&ndash;&gt;
-                    &lt;!&ndash;<execution>&ndash;&gt;
-                    &lt;!&ndash;<id>build-image</id>&ndash;&gt;
-                    &lt;!&ndash;<phase>package</phase>&ndash;&gt;
-                    &lt;!&ndash;<goals>&ndash;&gt;
-                    &lt;!&ndash;<goal>build</goal>&ndash;&gt;
-                    &lt;!&ndash;</goals>&ndash;&gt;
-                    &lt;!&ndash;</execution>&ndash;&gt;
-                    &lt;!&ndash;</executions>&ndash;&gt;
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${dockerfile.maven.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default</id>
+                            <goals>
+                                <!--如果package时不想用docker打包,就注释掉这个goal-->
+                                <goal>build</goal>
+                                <goal>push</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                     <configuration>
-                        <imageName>mall/${project.artifactId}:${project.version}</imageName>
-                        <dockerHost>${docker.host}</dockerHost>
-                        <baseImage>java:8</baseImage>
-                        <entryPoint>["java", "-jar", "-Dspring.profiles.active=prod","/${project.build.finalName}.jar"]
-                        </entryPoint>
-                        <resources>
-                            <resource>
-                                <targetPath>/</targetPath>
-                                <directory>${project.build.directory}</directory>
-                                <include>${project.build.finalName}.jar</include>
-                            </resource>
-                        </resources>
+                        <!-- 远程docker镜像服务器 认证 用户名 密码 没有认证可以去掉 -->
+                        <username>admin</username>
+                        <password>admin</password>
+                        <!-- ${docker.image.prefix} 镜像上传远程服务器地址 -->
+                        <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                        <tag>${project.version}</tag>
+                        <buildArgs>
+                            <!--提供参数向Dockerfile传递-->
+                            <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                        </buildArgs>
                     </configuration>
-                </plugin>-->
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
