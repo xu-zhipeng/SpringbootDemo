@@ -1,23 +1,23 @@
 version: '3'
 services:
-#  postgres:
-#    image: postgres:11
-#    container_name: postgres
-##    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-#    privileged: true  #解决权限
-#    restart: always
-#    environment:
-#      POSTGRES_PASSWORD: postgres #设置密码
-#      PGDATA: /var/lib/postgresql/data/pgdata #数据存储文件夹
-#    ports:
-#      - 5432:5432
-#    volumes:
-#      - /docker-env/postgres/data/db:/var/lib/postgresql/data/pgdata #数据文件挂载
+  postgres:
+    restart: always
+    image: postgres:11
+    container_name: postgres
+#    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    privileged: true  #解决权限
+    environment:
+      POSTGRES_PASSWORD: postgres #设置密码
+      PGDATA: /var/lib/postgresql/data/pgdata #数据存储文件夹
+    ports:
+      - 5432:5432
+    volumes:
+      - /docker-env/postgres/data/db:/var/lib/postgresql/data/pgdata #数据文件挂载
   mysql:
+    restart: always
     image: mysql:5.7
     container_name: mysql
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root #设置root帐号密码
     ports:
@@ -35,6 +35,7 @@ services:
 #    ports:
 #      - 6379:6379
   nginx:
+    restart: always
     image: nginx:1.10
     container_name: nginx
     volumes:

@@ -29,11 +29,11 @@ spring:
     timeout: 300ms # 连接超时时间（毫秒）
 
   rabbitmq:
-    host: localhost
-    port: 5672
+    host: ${MQ_HOST:localhost}
+    port: ${MQ_PORT:5672}
     virtual-host: /
-    username: admin
-    password: admin
+    username: ${MQ_USERNAME:admin}
+    password: ${MQ_PASSWORD:admin}
 
   quartz:
     # quartz db schema
