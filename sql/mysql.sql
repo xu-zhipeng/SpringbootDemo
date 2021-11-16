@@ -1,10 +1,10 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : yj_dev
+ Source Server         : localhost
  Source Server Type    : MySQL
  Source Server Version : 50725
- Source Host           : hzhetundb-dev.mysql.rds.aliyuncs.com:3306
+ Source Host           : 1.117.230.132:3306
  Source Schema         : royal_canin
 
  Target Server Type    : MySQL
@@ -381,5 +381,43 @@ CREATE TABLE `web_log` (
   `result` text NULL DEFAULT NULL COMMENT '返回结果'
 )ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '操作日志表' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Table structure for schedule_job
+-- ----------------------------
+DROP TABLE IF EXISTS `schedule_job`;
+CREATE TABLE `schedule_job`  (
+  `id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `bean_name` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'spring bean名称',
+  `params` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '参数',
+  `cron_expression` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'cron表达式不能为空',
+  `status` int(11) NULL DEFAULT NULL COMMENT '任务状态,0:暂停，1：执行（正常）',
+  `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `created_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `created_dt` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `modified_dt` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
+  `modified_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '修改人',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+INSERT INTO `schedule_job` VALUES ('1457230566411862018', 'testTask', '001', '*/10 * * * * ?', 0, 'test', '1', '2021-10-18 19:03:00', '2021-11-05 19:32:03', '1');
+
+-- ----------------------------
+-- Table structure for schedule_job_log
+-- ----------------------------
+DROP TABLE IF EXISTS `schedule_job_log`;
+CREATE TABLE `schedule_job_log`  (
+  `id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `job_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '任务id',
+  `bean_name` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'spring bean名称',
+  `params` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '参数',
+  `status` int(11) NULL DEFAULT NULL COMMENT '任务状态    0：成功    1：失败',
+  `error` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '失败信息',
+  `times` int(11) NULL DEFAULT NULL COMMENT '耗时(单位：毫秒)',
+  `created_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `created_dt` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `modified_dt` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
+  `modified_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '修改人',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

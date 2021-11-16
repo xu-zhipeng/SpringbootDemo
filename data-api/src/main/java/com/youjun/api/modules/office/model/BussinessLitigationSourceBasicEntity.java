@@ -2,7 +2,6 @@ package com.youjun.api.modules.office.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,8 +19,7 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("bussiness_litigation_source_basic")
-@ApiModel(value="BussinessLitigationSourceBasicEntity对象", description="诉源表")
+@ApiModel(value="BussinessLitigationSourceBasicEntity对象", description="诉源表 测试读取excel")
 public class BussinessLitigationSourceBasicEntity implements Serializable {
 
     private static final long serialVersionUID=1L;

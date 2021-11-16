@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName(schema = "submission",value = "schedule_job_log")
+@TableName(value = "schedule_job_log")
 @ApiModel(value="ScheduleJobLog", description="定时任务日志表")
 public class ScheduleJobLog implements Serializable {
 	private static final long serialVersionUID = 1L;

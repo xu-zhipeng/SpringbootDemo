@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName(schema = "submission",value = "schedule_job")
+@TableName(value = "schedule_job")
 @ApiModel(value="ScheduleJob", description="定时任务表")
 public class ScheduleJob implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -33,7 +33,7 @@ public class ScheduleJob implements Serializable {
 	 * 任务id
 	 */
 	@ApiModelProperty(value = "主键")
-	@TableId(value = "id", type = IdType.AUTO)
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
 	private String id;
 
 	/**

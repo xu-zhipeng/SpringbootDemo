@@ -828,3 +828,55 @@ GO
 ALTER TABLE [dbo].[web_log] SET (LOCK_ESCALATION = TABLE)
 GO
 
+-- ----------------------------
+-- Table structure for schedule_job
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[schedule_job]') AND type IN ('U'))
+	DROP TABLE [dbo].[schedule_job]
+GO
+
+CREATE TABLE [dbo].[schedule_job] (
+  [id] nvarchar(64) NOT NULL,
+  [bean_name] nvarchar(200) NULL,
+  [params] nvarchar(500) NULL,
+  [cron_expression] nvarchar(100) NULL,
+  [status] int NULL,
+  [remark] nvarchar(500) NULL,
+  [created_by] nvarchar(64) NULL,
+  [created_dt] datetime2(7) NULL,
+  [modified_dt] datetime2(7) NULL,
+  [modified_by] nvarchar(64) NULL
+)
+GO
+
+ALTER TABLE [dbo].[schedule_job] SET (LOCK_ESCALATION = TABLE)
+GO
+
+INSERT INTO [dbo].[schedule_job] ([id][bean_name],[params],[cron_expression],[status],[remark],[created_by],[created_dt],[modified_dt],[modified_by]) VALUES (N'1457230566411862018', N'testTask', N'001', N'*/10 * * * * ?', 0, N'test', N'1', '2021-10-18 19:03:00', '2021-11-05 19:32:03', N'1')
+GO
+
+-- ----------------------------
+-- Table structure for schedule_job_log
+-- ----------------------------
+IF EXISTS (SELECT * FROM sys.all_objects WHERE object_id = OBJECT_ID(N'[dbo].[schedule_job_log]') AND type IN ('U'))
+	DROP TABLE [dbo].[schedule_job_log]
+GO
+
+CREATE TABLE [dbo].[schedule_job_log] (
+  [id] nvarchar(64) NOT NULL,
+  [job_id] nvarchar(64) NULL,
+  [bean_name] nvarchar(200) NULL,
+  [params] nvarchar(500) NULL,
+  [status] int NULL,
+  [error] text NULL,
+  [times] int NULL,
+  [created_by] nvarchar(64) NULL,
+  [created_dt] datetime2(7) NULL,
+  [modified_dt] datetime2(7) NULL,
+  [modified_by] nvarchar(64) NULL
+)
+GO
+
+ALTER TABLE [dbo].[schedule_job_log] SET (LOCK_ESCALATION = TABLE)
+GO
+
