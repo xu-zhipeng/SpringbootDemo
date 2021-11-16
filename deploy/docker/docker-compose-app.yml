@@ -3,7 +3,7 @@ services:
   csi-trans-v3:
     #没有镜像 利用 Dockerfile 本地构建镜像
     build:
-      context: ./
+      context: ""
       dockerfile: Dockerfile
     #有镜像直接指定镜像
 #    image: csi-trans/csi-trans-v3:1.0-SNAPSHOT

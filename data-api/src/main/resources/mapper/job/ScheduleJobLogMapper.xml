@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.youjun.api.modules.job.mapper.ScheduleJobLogMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.youjun.api.modules.job.model.ScheduleJobLog">
+        <id column="id" property="id" />
+        <result column="jobId" property="jobId" />
+        <result column="beanName" property="beanName" />
+        <result column="params" property="params" />
+        <result column="status" property="status" />
+        <result column="error" property="error" />
+        <result column="times" property="times" />
+        <result column="createdBy" property="createdBy" />
+        <result column="createdDt" property="createdDt" />
+        <result column="modifiedBy" property="modifiedBy" />
+        <result column="modifiedDt" property="modifiedDt" />
+    </resultMap>
+
+</mapper>

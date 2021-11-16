@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youjun.api.modules.log.mapper.WebLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.youjun.common.domain.WebLog">
+        <id column="id" property="id"/>
+        <result column="description" property="description"/>
+        <result column="start_time" property="startTime"/>
+        <result column="spend_time" property="spendTime"/>
+        <result column="base_path" property="basePath"/>
+        <result column="uri" property="uri"/>
+        <result column="url" property="url"/>
+        <result column="method" property="method"/>
+        <result column="ip" property="ip"/>
+        <result column="parameter" property="parameter"/>
+        <result column="result" property="result"/>
+    </resultMap>
+
+    <select id="getWebLogList" resultType="com.youjun.common.domain.WebLog">
+        select * from ums.web_log
+        <where>
+            <if test="params.id != null and params.id != ''">
+                id = #{params.id}
+            </if>
+            <if test="params.username != null and params.username != ''">
+                and username = #{params.username}
+            </if>
+            <if test="params.method != null and params.method != ''">
+                and method = #{params.method}
+            </if>
+            <if test="params.ip != null and params.ip != ''">
+                and ip::varchar = #{params.ip}
+            </if>
+            <if test="params.description != null and params.description != ''">
+                and description = #{params.description}
+            </if>
+            <if test="params.uri != null and params.uri != ''">
+                and uri = #{params.uri}
+            </if>
+            <if test="params.startTime !=null and params.startTime[0] != null">
+                and start_time &gt;= #{params.startTime[0]}
+            </if>
+            <if test="params.startTime !=null and params.startTime[1] != null">
+                and start_time &lt;= #{params.startTime[1]}
+            </if>
+        </where>
+        order by start_time desc
+    </select>
+
+</mapper>
