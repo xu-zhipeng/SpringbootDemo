@@ -108,11 +108,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml-lite</artifactId>
-            <version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
             <version>${poi.version}</version>
         </dependency>
@@ -120,6 +115,14 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-excelant</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <!--doc 转 pdf-->
+        <dependency>
+            <groupId>aw.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>15.8.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/aspose/aspose-words-15.8.0.jar</systemPath>
         </dependency>
 
         <!-- dom4j xml解析 -->
