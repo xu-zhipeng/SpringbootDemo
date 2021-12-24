@@ -9,6 +9,7 @@ import com.youjun.api.domain.AdminUserDetails;
 import com.youjun.api.modules.job.enums.ScheduleStatus;
 import com.youjun.api.modules.job.mapper.ScheduleJobMapper;
 import com.youjun.api.modules.job.model.ScheduleJob;
+import com.youjun.api.modules.job.param.RunJobParam;
 import com.youjun.api.modules.job.param.ScheduleJobPageParam;
 import com.youjun.api.modules.job.service.ScheduleJobLogService;
 import com.youjun.api.modules.job.service.ScheduleJobService;
@@ -16,7 +17,6 @@ import com.youjun.api.modules.job.utils.ScheduleJobExcute;
 import com.youjun.api.modules.job.utils.ScheduleUtils;
 import com.youjun.common.exception.ApiException;
 import com.youjun.common.util.CollectionUtils;
-import com.youjun.common.util.JsonUtils;
 import com.youjun.common.util.StringUtils;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 @Service("scheduleJobService")
@@ -54,10 +53,10 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
                 CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob.getId());
                 // 如果不存在，则创建
                 if (cronTrigger == null) {
-                    log.info("创建定时器,trigger_name:TASK_{},BeanName:{}",scheduleJob.getId(),scheduleJob.getBeanName());
+                    log.info("创建定时器,trigger_name:TASK_{},BeanName:{}", scheduleJob.getId(), scheduleJob.getBeanName());
                     ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
                 } else {
-                    log.info("更新定时器,trigger_name:TASK_{},BeanName:{}",scheduleJob.getId(),scheduleJob.getBeanName());
+                    log.info("更新定时器,trigger_name:TASK_{},BeanName:{}", scheduleJob.getId(), scheduleJob.getBeanName());
                     ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
                 }
             } catch (Exception ex) {
@@ -137,10 +136,10 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void run(String[] jobIds) {
-        for (String jobId : jobIds) {
-            ScheduleUtils.run(scheduler, this.getById(jobId));
-        }
+    public void run(RunJobParam runJobParam) {
+        ScheduleJob scheduleJob = this.getById(runJobParam.getJobId());
+        scheduleJob.setParams(runJobParam.getParams());
+        ScheduleUtils.run(scheduler, scheduleJob);
     }
 
     @Override
@@ -164,20 +163,15 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     }
 
     @Override
-    public void syncRun(String[] jobIds) {
-        HashMap<String, String> errorMap = new HashMap<>();
-        for (String jobId : jobIds) {
-            ScheduleJob scheduleJob = this.getById(jobId);
-            ScheduleJobExcute scheduleJobExcute = new ScheduleJobExcute();
-            try {
-                scheduleJobExcute.executeInternal(scheduleJob);
-            } catch (Exception e) {
-                log.error("同步执行失败");
-                errorMap.put(scheduleJob.getBeanName(),e.getMessage());
-            }
-        }
-        if(CollectionUtils.isNotEmpty(errorMap)){
-            throw new ApiException(JsonUtils.toJson(errorMap));
+    public void syncRun(RunJobParam runJobParam) {
+        ScheduleJob scheduleJob = this.getById(runJobParam.getJobId());
+        scheduleJob.setParams(runJobParam.getParams());
+        ScheduleJobExcute scheduleJobExcute = new ScheduleJobExcute();
+        try {
+            scheduleJobExcute.executeInternal(scheduleJob, true);
+        } catch (Exception e) {
+            log.error("{},同步执行失败", scheduleJob.getBeanName());
+            throw new ApiException(e.getMessage());
         }
     }
 

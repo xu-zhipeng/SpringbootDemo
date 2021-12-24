@@ -3,6 +3,7 @@ package com.youjun.api.modules.job.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.youjun.api.modules.job.model.ScheduleJob;
+import com.youjun.api.modules.job.param.RunJobParam;
 import com.youjun.api.modules.job.param.ScheduleJobPageParam;
 
 /**
@@ -35,9 +36,9 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 	int updateBatch(String[] jobIds, int status);
 	
 	/**
-	 * 立即执行
+	 * 立即执行(异步)
 	 */
-	void run(String[] jobIds);
+	void run(RunJobParam runJobParam);
 	
 	/**
 	 * 暂停运行
@@ -52,5 +53,5 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 	/**
 	 * 立即执行(同步)
 	 */
-	void syncRun(String[] jobIds);
+	void syncRun(RunJobParam runJobParam);
 }

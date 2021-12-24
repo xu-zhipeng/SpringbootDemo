@@ -2,6 +2,7 @@ package com.youjun.api.modules.job.controller;
 
 
 import com.youjun.api.modules.job.model.ScheduleJob;
+import com.youjun.api.modules.job.param.RunJobParam;
 import com.youjun.api.modules.job.param.ScheduleJobPageParam;
 import com.youjun.api.modules.job.service.ScheduleJobService;
 import com.youjun.common.api.CommonPage;
@@ -11,6 +12,7 @@ import com.youjun.common.util.CollectionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +36,8 @@ public class ScheduleJobController {
     private ScheduleJobService scheduleJobService;
 
     @ApiOperation(value = "定时任务列表")
-    @PostMapping("/page")
-    public CommonResult<List<ScheduleJob>> page(ScheduleJobPageParam params) {
+    @PostMapping(value = "/page", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public CommonResult<List<ScheduleJob>> page(@RequestBody ScheduleJobPageParam params) {
         Map<String, Object> map = CommonPage.restPageToMap(scheduleJobService.queryPage(params));
         return CommonResult.success(null, map);
     }
@@ -52,9 +54,9 @@ public class ScheduleJobController {
     @ApiOperation(value = "保存定时任务")
     @PostMapping("/saveOrUpdate")
     public CommonResult saveOrUpdate(@RequestBody @Validated ScheduleJob scheduleJob) {
-        if(Objects.nonNull(scheduleJob.getId())){
+        if (Objects.nonNull(scheduleJob.getId())) {
             scheduleJobService.update(scheduleJob);
-        }else {
+        } else {
             scheduleJobService.saveJob(scheduleJob);
         }
         return CommonResult.success(null);
@@ -64,7 +66,7 @@ public class ScheduleJobController {
     @ApiOperation(value = "删除定时任务")
     @PostMapping("/delete")
     public CommonResult delete(@RequestBody String[] jobIds) {
-        if(CollectionUtils.isEmpty(jobIds)){
+        if (CollectionUtils.isEmpty(jobIds)) {
             return CommonResult.failed();
         }
         scheduleJobService.deleteBatch(jobIds);
@@ -75,11 +77,9 @@ public class ScheduleJobController {
     @MethodLog()
     @ApiOperation("立即执行任务(异步执行)")
     @PostMapping("/run")
-    public CommonResult run(@RequestBody String[] jobIds) {
-        if(CollectionUtils.isEmpty(jobIds)){
-            return CommonResult.failed();
-        }
-        scheduleJobService.run(jobIds);
+    public CommonResult run(@RequestBody @Validated RunJobParam runJobParam) {
+
+        scheduleJobService.run(runJobParam);
 
         return CommonResult.success(null);
     }
@@ -88,11 +88,9 @@ public class ScheduleJobController {
     @MethodLog()
     @ApiOperation("立即执行任务(同步执行)")
     @PostMapping("/syncRun")
-    public CommonResult syncRun(@RequestBody String[] jobIds) {
-        if(CollectionUtils.isEmpty(jobIds)){
-            return CommonResult.failed();
-        }
-        scheduleJobService.syncRun(jobIds);
+    public CommonResult syncRun(@RequestBody @Validated RunJobParam runJobParam) {
+
+        scheduleJobService.syncRun(runJobParam);
 
         return CommonResult.success(null);
     }
@@ -101,7 +99,7 @@ public class ScheduleJobController {
     @ApiOperation(value = "暂停定时任务")
     @PostMapping("/pause")
     public CommonResult pause(@RequestBody String[] jobIds) {
-        if(CollectionUtils.isEmpty(jobIds)){
+        if (CollectionUtils.isEmpty(jobIds)) {
             return CommonResult.failed();
         }
         scheduleJobService.pause(jobIds);
@@ -113,7 +111,7 @@ public class ScheduleJobController {
     @ApiOperation(value = "恢复定时任务")
     @PostMapping("/resume")
     public CommonResult resume(@RequestBody String[] jobIds) {
-        if(CollectionUtils.isEmpty(jobIds)){
+        if (CollectionUtils.isEmpty(jobIds)) {
             return CommonResult.failed();
         }
         scheduleJobService.resume(jobIds);

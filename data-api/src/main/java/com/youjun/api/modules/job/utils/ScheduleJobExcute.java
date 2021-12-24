@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -28,65 +30,15 @@ public class ScheduleJobExcute extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) {
         ScheduleJob scheduleJob = (ScheduleJob) context.getMergedJobDataMap().get(ScheduleJob.JOB_PARAM_KEY);
-
-        //获取spring bean
-        ScheduleJobLogService scheduleJobLogService = (ScheduleJobLogService) SpringContextUtils.getBean("scheduleJobLogService");
-
-        //数据库保存执行记录
-        ScheduleJobLog log = new ScheduleJobLog();
-        log.setJobId(scheduleJob.getId());
-        log.setBeanName(scheduleJob.getBeanName());
-        log.setParams(scheduleJob.getParams());
-        log.setCreatedDt(LocalDateTime.now());
-        log.setCreatedBy(SCHEDULE);
-        log.setModifiedDt(LocalDateTime.now());
-        log.setModifiedBy(SCHEDULE);
-        //任务开始时间
-        long startTime = System.currentTimeMillis();
-
-        try {
-            //执行任务
-            this.log.debug("任务准备执行，任务ID：" + scheduleJob.getId());
-
-            Object target = SpringContextUtils.getBean(scheduleJob.getBeanName());
-            Method method = target.getClass().getMethod("run", String.class);
-            method.invoke(target, scheduleJob.getParams());
-
-            //任务执行总时长
-            long times = System.currentTimeMillis() - startTime;
-            log.setTimes((int) times);
-            //任务状态     0：失败    1：成功
-            log.setStatus(1);
-            this.log.debug("任务执行完毕，任务ID：" + scheduleJob.getId() + "  总共耗时：" + times + "毫秒");
-        } catch (Exception e) {
-            this.log.error("任务执行失败，任务ID：" + scheduleJob.getId(), e);
-            //任务执行总时长
-            long times = System.currentTimeMillis() - startTime;
-            log.setTimes((int) times);
-            //任务状态    0：失败    1：成功
-            log.setStatus(0);
-            String message;
-            if (e instanceof InvocationTargetException) {
-                Throwable targetException = ((InvocationTargetException) e).getTargetException();
-                message = targetException.getMessage();
-            } else {
-                message = e.getMessage();
-            }
-            if (null != message && message.length() > 2000) {
-                message = message.substring(0, 2000);
-            }
-            log.setError(message);
-        } finally {
-            scheduleJobLogService.save(log);
-        }
+        executeInternal(scheduleJob, false);
     }
 
     /**
-     * 同步执行方法
+     * 执行方法
      *
      * @param scheduleJob
      */
-    public void executeInternal(ScheduleJob scheduleJob) {
+    public void executeInternal(ScheduleJob scheduleJob, boolean throwEx) {
         //获取spring bean
         ScheduleJobLogService scheduleJobLogService = (ScheduleJobLogService) SpringContextUtils.getBean("scheduleJobLogService");
 
@@ -104,7 +56,7 @@ public class ScheduleJobExcute extends QuartzJobBean {
 
         try {
             //执行任务
-            this.log.debug("任务准备执行，任务ID：" + scheduleJob.getId());
+            this.log.debug("任务准备执行，任务ID{}，任务名称{}", scheduleJob.getId(), scheduleJob.getBeanName());
 
             Object target = SpringContextUtils.getBean(scheduleJob.getBeanName());
             Method method = target.getClass().getMethod("run", String.class);
@@ -115,9 +67,10 @@ public class ScheduleJobExcute extends QuartzJobBean {
             log.setTimes((int) times);
             //任务状态     0：失败    1：成功
             log.setStatus(1);
-            this.log.debug("任务执行完毕，任务ID：" + scheduleJob.getId() + "  总共耗时：" + times + "毫秒");
+            this.log.debug("任务执行完毕，任务ID：{}，任务名称：{}，总共耗时：{}毫秒", scheduleJob.getId(), scheduleJob.getBeanName(), times);
         } catch (Exception e) {
-            this.log.error("任务执行失败，任务ID：" + scheduleJob.getId(), e);
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter, true);
             //任务执行总时长
             long times = System.currentTimeMillis() - startTime;
             log.setTimes((int) times);
@@ -126,15 +79,22 @@ public class ScheduleJobExcute extends QuartzJobBean {
             String message;
             if (e instanceof InvocationTargetException) {
                 Throwable targetException = ((InvocationTargetException) e).getTargetException();
-                message = targetException.getMessage();
+                targetException.printStackTrace(printWriter);
+                message = String.format("任务执行失败，任务ID：%s，任务名称：%s，\n内容：%s，\n位置：%s", scheduleJob.getId(), scheduleJob.getBeanName(), targetException.getMessage(), stringWriter.toString());
             } else {
-                message = e.getMessage();
+                e.printStackTrace(printWriter);
+                message = String.format("任务执行失败，任务ID：%s，任务名称：%s，\n内容：%s，\n位置：%s", scheduleJob.getId(), scheduleJob.getBeanName(), e.getMessage(), stringWriter.toString());
             }
-            if (null != message && message.length() > 2000) {
-                message = message.substring(0, 2000);
+            printWriter.flush();
+            stringWriter.flush();
+            this.log.error(message);
+            if (null != message && message.length() > 5000) {
+                message = message.substring(0, 5000);
             }
             log.setError(message);
-            throw new ApiException(message);
+            if (throwEx) {
+                throw new ApiException(message);
+            }
         } finally {
             scheduleJobLogService.save(log);
         }
