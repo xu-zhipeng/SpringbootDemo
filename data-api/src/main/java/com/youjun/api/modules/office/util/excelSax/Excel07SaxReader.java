@@ -301,8 +301,10 @@ public class Excel07SaxReader extends DefaultHandler implements ExcelSaxReader<E
                 this.numFmtIndex = this.xssfCellStyle.getDataFormat();
                 this.numFmtString = Optional.ofNullable(this.xssfCellStyle.getDataFormatString()).orElse(BuiltinFormats.getBuiltinFormat(this.numFmtIndex));
                 if (CellDataType.NUMBER == this.cellDataType && isDateFormat(this.numFmtIndex, this.numFmtString)) {
-                    this.numFmtString = getFormatString(this.numFmtString);
                     this.cellDataType = CellDataType.DATE;
+                    if(!DateUtil.isADateFormat(this.numFmtIndex, this.numFmtString)){
+                        this.numFmtString = getFormatString(this.numFmtString);
+                    }
                 }
             }
         }
@@ -397,30 +399,9 @@ public class Excel07SaxReader extends DefaultHandler implements ExcelSaxReader<E
      */
     private String getFormatString(String formatString) {
         switch (formatString) {
-            case "m/d/yy":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "m/d/yyyy":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy/mm/dd":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy/m/d":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy\\-mm\\-dd":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy\\-m\\-d":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy\\-mm\\-dd\\ hh:mm:ss":
-                formatString = "yyyy-MM-dd hh:mm:ss";
-                break;
             case "reserved-0x1F":
                 //yyyy"年"m"月"d"日"之类的格式无法识别 进入这里
-                formatString = "yyyy-MM-dd hh:mm:ss";
+                formatString = "yyyy-MM-dd";
                 break;
             default:
                 formatString = "yyyy-MM-dd hh:mm:ss";

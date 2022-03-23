@@ -23,23 +23,13 @@ import java.util.Map;
  * @since 2022/3/14
  */
 public class ExcelSaxRead {
-    private boolean firstFlag = true;
-    private int currentSheetIndex = 0;
-    private String currentSheetName = null;
-    private Map<String, Object[][]> dataArray = new HashMap<>();
-    private List<Object[]> rowList = new ArrayList<>();
 
     public Map<String, Object[][]> read(InputStream in) {
         in = IoUtil.toMarkSupportStream(in);
-        RowHandler rowHandler = createRowHandler();
+        RowHandlerImpl rowHandler = new RowHandlerImpl();
         ExcelSaxReader<?> reader = (ExcelFileUtil.isXlsx(in) ? new Excel07SaxReader(rowHandler) : new Excel03SaxReader(rowHandler));
         reader.read(in, -1);
-        //最后一个sheet遍历结束 push row
-        Object[] rowArray = rowList.toArray();
-        Object[][] sheetArray = new Object[rowList.size()][];
-        System.arraycopy(rowArray, 0, sheetArray, 0, rowArray.length);
-        dataArray.put(currentSheetName, sheetArray);
-        return dataArray;
+        return rowHandler.dataArray;
     }
 
     /**
@@ -47,53 +37,55 @@ public class ExcelSaxRead {
      *
      * @return
      */
-    private RowHandler createRowHandler() {
-        return new RowHandler() {
-            @Override
-            public void handle(int sheetIndex, String sheetName, long rowIndex, List<Object> row) {
-                if (firstFlag) {
-                    currentSheetName = sheetName;
-                    firstFlag = false;
-                }
-                if (currentSheetIndex != sheetIndex) {
-                    //sheet遍历结束 push row
-                    Object[] rowArray = rowList.toArray();
-                    Object[][] sheetArray = new Object[rowList.size()][];
-                    System.arraycopy(rowArray, 0, sheetArray, 0, rowArray.length);
-                    dataArray.put(currentSheetName, sheetArray);
-                    currentSheetIndex = sheetIndex;
-                    currentSheetName = sheetName;
-                    rowList = new ArrayList<>();
-                }
-                if (CollectionUtils.isNotEmpty(row)) {
-                    Object[] cellArray = new Object[row.size()];
-                    int j = 0;
-                    boolean notEmpty = false;
-                    for (Object cell : row) {
-                        if (null == cell || StringUtils.isBlank(cell.toString())) {
-                            cell = "";
-                        } else {
-                            notEmpty = true;
-                        }
-                        cellArray[j] = cell.toString();
-                        j++;
-                    }
-                    int size = rowList.size();
-                    while (size < (rowIndex)) {
-                        rowList.add(new Object[]{});
-                        size++;
-                    }
-                    if (notEmpty) {
-                        rowList.add(cellArray);
-                    } else {
-                        rowList.add(new Object[]{});
-                    }
-                }
-            }
+    class RowHandlerImpl implements RowHandler {
+        private int currentSheetIndex = 0;
+        private String currentSheetName = null;
+        private Map<String, Object[][]> dataArray = new HashMap<>();
+        private List<Object[]> rowList = new ArrayList<>();
 
-            @Override
-            public void handleCell(int sheetIndex, String sheetName, long rowIndex, int cellIndex, Object value, CellStyle xssfCellStyle) {
+        @Override
+        public void handle(int sheetIndex, String sheetName, long rowIndex, List<Object> row) {
+            this.currentSheetIndex = sheetIndex;
+            this.currentSheetName = sheetName;
+            if (CollectionUtils.isNotEmpty(row)) {
+                Object[] cellArray = new Object[row.size()];
+                int j = 0;
+                boolean notEmpty = false;
+                for (Object cell : row) {
+                    if (null == cell || StringUtils.isBlank(cell.toString())) {
+                        cell = "";
+                    } else {
+                        notEmpty = true;
+                    }
+                    cellArray[j] = cell.toString();
+                    j++;
+                }
+                int size = this.rowList.size();
+                while (size < (rowIndex)) {
+                    this.rowList.add(new Object[]{});
+                    size++;
+                }
+                if (notEmpty) {
+                    this.rowList.add(cellArray);
+                } else {
+                    this.rowList.add(new Object[]{});
+                }
             }
-        };
+        }
+
+        @Override
+        public void handleCell(int sheetIndex, String sheetName, long rowIndex, int cellIndex, Object value, CellStyle xssfCellStyle) {
+
+        }
+
+        @Override
+        public void doAfterAllAnalysed() {
+            //最后一个行遍历结束 push row
+            Object[] rowArray = this.rowList.toArray();
+            Object[][] sheetArray = new Object[this.rowList.size()][];
+            System.arraycopy(rowArray, 0, sheetArray, 0, rowArray.length);
+            this.dataArray.put(this.currentSheetName, sheetArray);
+            this.rowList = new ArrayList<>();
+        }
     }
 }

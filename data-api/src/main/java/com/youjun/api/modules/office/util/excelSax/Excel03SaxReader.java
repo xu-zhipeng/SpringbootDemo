@@ -258,7 +258,9 @@ public class Excel03SaxReader implements HSSFListener, ExcelSaxReader<Excel03Sax
              * 其一：修改formatString，修改成我们想要的格式(并且formatRawCellContents内部的isADateFormat方法能够判断为true) 然后调用formatRawCellContents方法
              * 其二：自定义isADateFormat方法对其做增强,然后调用 DateUtil.getJavaDate(value, false);方法获取java Date类型时间
              */
-            formatString = getFormatString(formatString);
+            if(!DateUtil.isADateFormat(formatIndex, formatString)){
+                formatString = getFormatString(formatString);
+            }
             return this.formatter.formatRawCellContents(value, formatIndex, formatString);
         } else {
             return this.formatter.formatRawCellContents(value, formatIndex, formatString);
@@ -290,30 +292,9 @@ public class Excel03SaxReader implements HSSFListener, ExcelSaxReader<Excel03Sax
      */
     private String getFormatString(String formatString) {
         switch (formatString) {
-            case "m/d/yy":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "m/d/yyyy":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy/mm/dd":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy/m/d":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy\\-mm\\-dd":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy\\-m\\-d":
-                formatString = "yyyy-MM-dd";
-                break;
-            case "yyyy\\-mm\\-dd\\ hh:mm:ss":
-                formatString = "yyyy-MM-dd hh:mm:ss";
-                break;
             case "reserved-0x1F":
                 //yyyy"年"m"月"d"日"之类的格式无法识别 进入这里
-                formatString = "yyyy-MM-dd hh:mm:ss";
+                formatString = "yyyy-MM-dd";
                 break;
             default:
                 formatString = "yyyy-MM-dd hh:mm:ss";
