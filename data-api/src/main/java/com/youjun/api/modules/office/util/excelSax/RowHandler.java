@@ -37,7 +37,7 @@ public interface RowHandler {
     }
 
     /**
-     * 所有数据处理完毕后收尾接口
+     * 遍历完单个sheet所有行后 数据处理接口
      */
     default void doAfterAllAnalysed() {
     }
