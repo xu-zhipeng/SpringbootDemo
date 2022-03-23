@@ -1,18 +1,16 @@
 package com.youjun.api.modules.office.util.excelSax;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import java.util.List;
+
 /**
  * <p>
- *
+ *  excel 解析数据处理接口
  * </p>
  *
  * @author kirk
  * @since 2022/3/15
  */
-
-import org.apache.poi.ss.usermodel.CellStyle;
-
-import java.util.List;
-
 @FunctionalInterface
 public interface RowHandler {
     /**
