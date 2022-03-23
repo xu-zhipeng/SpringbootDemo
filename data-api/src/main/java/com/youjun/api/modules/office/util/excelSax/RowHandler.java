@@ -1,11 +1,12 @@
 package com.youjun.api.modules.office.util.excelSax;
 
 import org.apache.poi.ss.usermodel.CellStyle;
+
 import java.util.List;
 
 /**
  * <p>
- *  excel 解析数据处理接口
+ * excel 解析数据处理接口
  * </p>
  *
  * @author kirk
@@ -15,6 +16,7 @@ import java.util.List;
 public interface RowHandler {
     /**
      * 行数据处理接口
+     *
      * @param sheetIndex
      * @param sheetName
      * @param rowIndex
@@ -24,6 +26,7 @@ public interface RowHandler {
 
     /**
      * 单元格数据处理接口
+     *
      * @param sheetIndex
      * @param sheetName
      * @param rowIndex
