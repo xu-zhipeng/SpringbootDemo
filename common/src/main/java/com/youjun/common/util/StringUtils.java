@@ -1,6 +1,10 @@
 package com.youjun.common.util;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * <p>
  *  字符串工具类
@@ -74,5 +78,34 @@ public class StringUtils {
 
     public static boolean isNotEmpty(CharSequence str) {
         return !isEmpty(str);
+    }
+
+    public static String fillBefore(String str, char filledChar, int len) {
+        return fill(str, filledChar, len, true);
+    }
+
+    public static String fillAfter(String str, char filledChar, int len) {
+        return fill(str, filledChar, len, false);
+    }
+
+    private static String fill(String str, char filledChar, int len, boolean isPre) {
+        int strLen = str.length();
+        if (strLen > len) {
+            return str;
+        } else {
+            StringBuilder filledStr = new StringBuilder();
+            for (int i = 0; i < len - strLen; i++) {
+                filledStr.append(filledChar);
+            }
+            return isPre ? filledStr.toString().concat(str) : str.concat(filledStr.toString());
+        }
+    }
+
+    public static String toDateFormatString(String source, String sourceFormat, String targetFormat) throws ParseException {
+        SimpleDateFormat sourceFmt = new SimpleDateFormat(sourceFormat);
+        Date date = sourceFmt.parse(source);
+        SimpleDateFormat targetFmt = new SimpleDateFormat(targetFormat);
+        String targetStr = targetFmt.format(date);
+        return targetStr;
     }
 }

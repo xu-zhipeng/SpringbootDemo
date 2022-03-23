@@ -26,7 +26,7 @@ public class CellUtils {
     public static final DataFormatter formatter = new DataFormatter();
 
     public static Object getCellValue(Cell cell) {
-        return getCellValue(cell, false, false);
+        return getCellValue(cell, false, true);
     }
 
     public static Object getCellValue(Cell cell, boolean isFormatNumberic, boolean isSetMergeCellValue) {
@@ -87,7 +87,7 @@ public class CellUtils {
                     value = null;
                 }
         }
-        return value;
+        return value != null ? value : "";
     }
 
     public static void setCellValue(Cell cell, Object value) {
