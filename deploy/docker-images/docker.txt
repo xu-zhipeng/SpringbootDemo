@@ -1,0 +1,114 @@
+#注意：下面这个方法不可行
+#原因：首先运行进去安装有权限问题,通过运行/usr/sbin/init解决
+#后续又有数据库路径挂载到外部之后,无法启动（猜测可能只有postgres docker镜像才能够挂载吧,普通安装包不支持）
+#但是整体思路是对的,docker部署给客户有两种方式
+#其一：运行一个centos容器,把需要的东西都安装好,打包成一个全新的镜像,然后客户就直接使用镜像.(缺点：如果有些软件无法挂载的话,后续维护比较麻烦,比如数据库)
+#其二：通过docker或dockercompose将镜像分为：源码镜像+环境镜像(如：数据库镜像+redis镜像等)多个镜像提交给用户(优点：可以挂载,环境镜像更新维护比较方便)
+
+#启动容器
+docker run -d  \
+    --name=submission-test \
+    --privileged=true \
+    -v /tongyu-package/docker-images:/tongyu/docker-images \
+    -v /tongyu-package/sql:/tongyu/sql \
+    -v /tongyu-package/pgdata:/var/lib/pgsql/14/data \
+    -p 80:7070 \
+    centos:7 \
+    /usr/sbin/init
+
+#安裝jdk
+yum install -y java-1.8.0-openjdk-devel.x86_64
+
+Postgresql 14 安装
+
+#选择正确的YUM安装源
+yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+
+#安装postgreSQL14
+yum install postgresql14-contrib postgresql14-server –y
+#安装初始化
+/usr/pgsql-14/bin/postgresql-14-setup initdb
+#设置开机自启动
+systemctl enable postgresql-14
+#重启数据库服务
+systemctl restart postgresql-14
+#配置数据库远程连接信任（由于默认配置不支持密码认证，仅可供本地服务器访问，所以需要进行相关配置）
+vi /var/lib/pgsql/14/data/pg_hba.conf
+
+local   all  all    trust
+host all all 0.0.0.0/0 md5
+
+#开启远程访问
+vi /var/lib/pgsql/14/data/postgresql.conf
+
+listen_addresses = '*'
+
+#切换postgres用户，并修改postgres用户的连接密码
+su - postgres
+psql
+ALTER USER postgres WITH PASSWORD 'postgres';
+\q
+exit
+#重启数据库服务
+systemctl restart postgresql-14
+
+#执行sql
+cd /tongyu/sql/all/Basic
+bash init_data.sh
+cd /tongyu/sql/all/CrossBorder
+bash update_data.sh
+cd /tongyu/sql/all/Exchange
+bash update_data.sh
+cd /tongyu/sql/all/Other
+bash update_data.sh
+
+#启动服务
+bash /tongyu/docker-images/server-init.sh
+
+#退出
+exit
+
+#退出容器
+docker stop submission-test
+
+#提交镜像
+docker commit submission-test submission:test
+
+#重构镜像-让镜像自启动
+docker build -t submission:4.5.2 .
+
+#测试容器
+docker run -d  \
+    --name=submission-4.5.2 \
+    --privileged=true \
+    -v /tongyu-package-test/docker-images:/tongyu/docker-images \
+    -v /tongyu-package-test/sql:/tongyu/sql \
+    -v /tongyu-package-test/pgdata:/var/lib/pgsql/14/data \
+    -p 80:7070 \
+    submission:4.5.2 \
+    /usr/sbin/init
+
+# -it 不进入后台查看报错
+docker run -it  \
+    --name=submission-test4-1 \
+    --privileged=true \
+    -v /tongyu-package-test/docker-images:/tongyu/docker-images \
+    -v /tongyu-package-test/sql:/tongyu/sql \
+    -v /tongyu-package-test/pgdata:/var/lib/pgsql/14/data \
+    -p 80:7070 \
+    submission:test4 \
+    /usr/sbin/init
+
+#保存镜像到本地
+docker save -o /home/tongyu/docker-env/images/csi-trans-v3-4.5.2.tar.gz b8b42d42159d
+docker save -o /home/tongyu/docker-env/images/postgres-11.tar.gz b8b42d42159d
+
+#从本地加载镜像
+docker load -i /home/tongyu/docker-env/images/csi-trans-v3-4.5.2.tar.gz
+docker load -i /home/tongyu/docker-env/images/postgres-11.tar.gz
+
+
+#总结
+这个方法目前postgres 数据库 无法挂载数据到主机目录，挂载完会无法启动.
+
+
