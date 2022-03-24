@@ -1,7 +1,13 @@
 HELP.md
 target/
+build/
 !.mvn/wrapper/maven-wrapper.jar
-static/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### Gradle ###
+.gradle/
 
 ### STS ###
 .apt_generated
@@ -24,15 +30,10 @@ static/
 /dist/
 /nbdist/
 /.nb-gradle/
-/build/
 
 ### VS Code ###
 .vscode/
 
-# Eclipse project files
+### Eclipse ###
 .classpath
 .project
-
-### Gradle ###
-.gradle/
-build/
