@@ -3,6 +3,7 @@ package com.youjun.api.config;
 import com.youjun.common.config.BaseSwaggerConfig;
 import com.youjun.common.domain.SwaggerProperties;
 import org.springframework.context.annotation.Configuration;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -10,7 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * Created on 2018/4/26.
  */
 @Configuration
-@EnableSwagger2
+@EnableOpenApi
 public class SwaggerConfig extends BaseSwaggerConfig {
 
     @Override

@@ -10,8 +10,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Swagger基础配置
@@ -21,10 +20,16 @@ public abstract class BaseSwaggerConfig {
 
     @Bean
     public Docket createRestApi() {
+        Set<String> set = new HashSet<>();
+        set.add("https");
+        set.add("http");
         SwaggerProperties swaggerProperties = swaggerProperties();
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
+        Docket docket = new Docket(DocumentationType.OAS_30)
+                //支持的协议
+                .protocols(set)
                 .apiInfo(apiInfo(swaggerProperties))
                 .select()
+                //包扫描地址
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getApiBasePackage()))
                 .paths(PathSelectors.any())
                 .build();
@@ -43,19 +48,15 @@ public abstract class BaseSwaggerConfig {
                 .build();
     }
 
-    private List<ApiKey> securitySchemes() {
+    private List<SecurityScheme> securitySchemes() {
         //设置请求头信息
-        List<ApiKey> result = new ArrayList<>();
         ApiKey apiKey = new ApiKey("Authorization", "Authorization", "header");
-        result.add(apiKey);
-        return result;
+        return Collections.singletonList(apiKey);
     }
 
     private List<SecurityContext> securityContexts() {
         //设置需要登录认证的路径
-        List<SecurityContext> result = new ArrayList<>();
-        result.add(getContextByPath("/*/.*"));
-        return result;
+        return Collections.singletonList(getContextByPath("/*/.*"));
     }
 
     private SecurityContext getContextByPath(String pathRegex) {
@@ -66,12 +67,10 @@ public abstract class BaseSwaggerConfig {
     }
 
     private List<SecurityReference> defaultAuth() {
-        List<SecurityReference> result = new ArrayList<>();
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        result.add(new SecurityReference("Authorization", authorizationScopes));
-        return result;
+        return Collections.singletonList(new SecurityReference("Authorization", authorizationScopes));
     }
 
     /**
