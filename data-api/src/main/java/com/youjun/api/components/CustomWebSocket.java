@@ -8,9 +8,8 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -26,14 +25,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class CustomWebSocket {
     static Logger log = LoggerFactory.getLogger(CustomWebSocket.class);
     // 静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
-    // concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private static CopyOnWriteArraySet<CustomWebSocket> webSocketSet = new CopyOnWriteArraySet<CustomWebSocket>();
+    private static AtomicInteger onlineCount = new AtomicInteger();
+    // concurrent包的线程安全，用来存放每个客户端对应的MyWebSocket对象。
+    private static ConcurrentHashMap<String, CustomWebSocket> webSocketMap = new ConcurrentHashMap<>();
     // 与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
     /** 接收userId */
     private String userId = "";
-    private static Map<String, CustomWebSocket> webSocketMap = new HashMap<>();
 
     /**
      * 连接建立成功调用的方法
@@ -42,7 +40,6 @@ public class CustomWebSocket {
     public void onOpen(Session session, @PathParam("userId") String userId) {
         this.session = session;
         this.userId = userId;
-        webSocketSet.add(this);
         if (webSocketMap.containsKey(userId)) {
             webSocketMap.remove(userId);
             webSocketMap.put(userId, this);
@@ -64,7 +61,6 @@ public class CustomWebSocket {
      */
     @OnClose
     public void onClose() {
-        webSocketSet.remove(this); // 从set中删除
         if (webSocketMap.containsKey(userId)) {
             webSocketMap.remove(userId);
         }
@@ -86,7 +82,7 @@ public class CustomWebSocket {
             try {
                 item.sendMessage(message);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }*/
     }
@@ -110,9 +106,9 @@ public class CustomWebSocket {
      * 群发自定义消息
      */
     public static void sendInfo(String message) throws IOException {
-        for (CustomWebSocket item : webSocketSet) {
+        for (String key : webSocketMap.keySet()) {
             try {
-                item.sendMessage(message);
+                webSocketMap.get(key).sendMessage(message);
             } catch (IOException e) {
                 log.error("群发,{{}}信息发送失败",message);
                 continue;
@@ -142,22 +138,22 @@ public class CustomWebSocket {
      *
      * @return
      */
-    public static synchronized int getOnlineCount() {
+    public static AtomicInteger getOnlineCount() {
         return onlineCount;
     }
 
     /**
      * 添加线上链接的客户端数量
      */
-    public static synchronized void addOnlineCount() {
-        CustomWebSocket.onlineCount++;
+    public static void addOnlineCount() {
+        CustomWebSocket.onlineCount.incrementAndGet();
     }
 
     /**
      * 客户端下载是调用将在线数量减1
      */
-    public static synchronized void subOnlineCount() {
-        CustomWebSocket.onlineCount--;
+    public static void subOnlineCount() {
+        CustomWebSocket.onlineCount.decrementAndGet();
     }
 }
 
