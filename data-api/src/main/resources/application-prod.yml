@@ -42,6 +42,11 @@ spring:
     #jdbc.initialize-schema=never
     jdbc.initialize-schema: always
 
+  activiti:
+    db-history-used: true
+    history-level: full
+    check-process-definitions: false # 自动部署验证设置:true-开启（默认）、false-关闭
+
 logging:
   level:
     root: info

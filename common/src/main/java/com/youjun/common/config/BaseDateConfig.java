@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.youjun.common.exception.ApiException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 
@@ -26,7 +27,7 @@ import java.util.Date;
 
 /**
  * <p>
- *  LocalDateTime、LocalDate、LocalTime全局日期转换配置
+ * LocalDateTime、LocalDate、LocalTime全局日期转换配置
  * </p>
  *
  * @author kirk
@@ -107,6 +108,7 @@ public class BaseDateConfig {
      * Json序列化和反序列化转换器，用于转换Post请求体中的json以及将我们的对象序列化为返回响应的json
      */
     @Bean
+    @ConditionalOnBean(value = ObjectMapper.class)
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

@@ -31,6 +31,7 @@
         <skipTests>true</skipTests>
         <docker.image.prefix>1.117.230.132:5000</docker.image.prefix>
         <dockerfile.maven.plugin.version>1.4.10</dockerfile.maven.plugin.version>
+        <activiti-dependencies.version>7.1.0-M11</activiti-dependencies.version>
         <druid.version>1.1.23</druid.version>
         <hutool.version>5.6.2</hutool.version>
         <guava.version>30.1.1-jre</guava.version>
@@ -90,6 +91,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <!--集成activiti-->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter</artifactId>
+            <version>${activiti-dependencies.version}</version>
         </dependency>
         <!--lombok依赖-->
         <dependency>
@@ -269,6 +276,13 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>activiti-releases</id>
+            <url>https://artifacts.alfresco.com/nexus/content/repositories/activiti-releases</url>
+        </repository>
+    </repositories>
 
     <build>
         <pluginManagement>
