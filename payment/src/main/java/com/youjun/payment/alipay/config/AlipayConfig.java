@@ -6,15 +6,11 @@
  */
 package com.youjun.payment.alipay.config;
 
-import cn.hutool.core.bean.BeanUtil;
+import      cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import java.io.Serializable;
 
 /**
  * @author hupeng
@@ -24,7 +20,7 @@ import java.io.Serializable;
 @Data
 @Slf4j
 @ConfigurationProperties(prefix = "pay.alipay")
-public class AlipayConfig{
+public class AlipayConfig {
 
     /** 主键 */
     //@TableId
