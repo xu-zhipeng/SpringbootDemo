@@ -7,6 +7,9 @@ spring:
     multipart:
       enabled: true #开启文件上传
       max-file-size: 10MB #限制文件上传大小为10M
+  banner:
+    charset: UTF-8
+    location: classpath:banner.txt
   #MQ消息队列
   rabbitmq:
     # 消息确认（ACK）
@@ -80,14 +83,14 @@ secure:
 
 aliyun:
   oss:
-    endpoint: oss-cn-shenzhen.aliyuncs.com # oss对外服务的访问域名
-    accessKeyId: test # 访问身份验证中用到用户标识
-    accessKeySecret: test # 用户用于加密签名字符串和oss用来验证签名字符串的密钥
-    bucketName: kirk-oss # oss的存储空间
+    endpoint: oss-cn-hangzhou.aliyuncs.com # oss对外服务的访问域名
+    accessKeyId: LTAI5tEM9Cdu6TyqZgtvTLFx # 访问身份验证中用到用户标识
+    accessKeySecret: VOUegtxVk4T9ZbBGn7L7XKQSqyqUoz # 用户用于加密签名字符串和oss用来验证签名字符串的密钥
+    bucketName: kirk-hz-dev # oss的存储空间
     policy:
       expire: 300 # 签名有效期(S)
     maxSize: 10 # 上传文件大小(M)
-    callback: http://39.98.190.128:8080/aliyun/oss/callback # 文件上传成功后的回调地址
+    callback: http://1.117.230.132:8080/aliyun/oss/callback # 文件上传成功后的回调地址
     dir:
       prefix: mall/images/ # 上传文件夹路径前缀
 
