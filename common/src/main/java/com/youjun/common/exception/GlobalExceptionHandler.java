@@ -1,7 +1,6 @@
 package com.youjun.common.exception;
 
 import com.youjun.common.api.CommonResult;
-import com.youjun.common.api.ResultCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
@@ -41,7 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ApiException.class)
     public CommonResult handle(ApiException e) {
         log.error(e.getMessage());
-        if (e.getErrorCode().equals(ResultCode.FAILED)) {
+        if (e.getErrorCode() != null) {
             return CommonResult.failed(e.getErrorCode());
         }
         return CommonResult.failed(e.getMessage());

@@ -10,6 +10,9 @@ spring:
   banner:
     charset: UTF-8
     location: classpath:banner.txt
+  #全局懒加载 解决循环依赖，不建议这种方式，建议用@Lazy注解
+  main:
+    lazy-initialization: true
   #MQ消息队列
   rabbitmq:
     # 消息确认（ACK）
@@ -20,6 +23,21 @@ spring:
         acknowledge-mode: manual
       simple:
         acknowledge-mode: manual
+  mail:
+    host: smtp.qq.com # 配置 smtp 服务器地址
+    port: 465 # smtp 服务器的端口 http 25   https 465
+    username: 571761747@qq.com # 配置邮箱用户名(你的邮箱地址)
+    password: bdwwvqznzgepbcgg # 配置申请到的授权码(刚让复制的授权码)
+    default-encoding: UTF-8 # 配置邮件编码
+    #开启ssl加密规则
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          socketFactoryClass: javax.net.ssl.SSLSocketFactory
+        debug: true
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
