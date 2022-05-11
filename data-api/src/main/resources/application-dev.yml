@@ -6,7 +6,7 @@ spring:
     #1.数据库配置 默认数据连接池是 HikariCP
     type: com.alibaba.druid.pool.DruidDataSource #使用druid数据源
     # mysql
-    url: jdbc:mysql://1.117.230.132:3306/springbootdemo?allowMultiQueries=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/springbootdemo?allowMultiQueries=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
     # mssql
