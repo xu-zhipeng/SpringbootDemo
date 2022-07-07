@@ -2,10 +2,10 @@ package com.youjun.common.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class IpAddressUtil {
+public class IpAddressUtils {
     public static final String UNKNOWN = "unKnown";
 
-    private IpAddressUtil() {
+    private IpAddressUtils() {
     }
 
     public static String getIpAddress(HttpServletRequest request) {

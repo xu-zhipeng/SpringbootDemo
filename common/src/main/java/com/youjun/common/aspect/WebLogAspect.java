@@ -10,7 +10,7 @@ import com.youjun.common.api.PageParam;
 import com.youjun.common.domain.WebLog;
 import com.youjun.common.log.MethodArgLog;
 import com.youjun.common.service.WebLogAspectService;
-import com.youjun.common.util.IpAddressUtil;
+import com.youjun.common.util.IpAddressUtils;
 import com.youjun.common.util.StringUtils;
 import com.youjun.common.util.TimeUtils;
 import io.swagger.annotations.ApiOperation;
@@ -102,7 +102,7 @@ public class WebLogAspect {
         long endTime = System.currentTimeMillis();
         String urlStr = request.getRequestURL().toString();
         webLog.setBasePath(StrUtil.removeSuffix(urlStr, URLUtil.url(urlStr).getPath()));
-        webLog.setIp(IpAddressUtil.getIpAddress(request));
+        webLog.setIp(IpAddressUtils.getIpAddress(request));
         webLog.setMethod(request.getMethod());
         try {
             String parameter = getParameter(method, joinPoint.getArgs());

@@ -2,7 +2,7 @@ package com.youjun.security.config;
 
 
 import com.youjun.security.component.*;
-import com.youjun.security.util.JwtTokenUtil;
+import com.youjun.security.util.JwtTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -102,8 +102,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtTokenUtil jwtTokenUtil() {
-        return new JwtTokenUtil();
+    public JwtTokenUtils jwtTokenUtil() {
+        return new JwtTokenUtils();
     }
 
     @ConditionalOnBean(name = "dynamicSecurityService")

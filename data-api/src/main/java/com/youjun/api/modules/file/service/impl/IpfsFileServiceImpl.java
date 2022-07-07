@@ -2,7 +2,7 @@ package com.youjun.api.modules.file.service.impl;
 
 
 import com.youjun.api.modules.file.service.FileService;
-import com.youjun.api.modules.file.util.IpfsUtil;
+import com.youjun.api.modules.file.util.IpfsUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class IpfsFileServiceImpl implements FileService {
     public String uploadFile(MultipartFile sourceFile) throws IOException {
         //源文件扩展名
         String fileExtension = sourceFile.getOriginalFilename().split("\\.")[1];
-        String hash = IpfsUtil.upload(sourceFile.getInputStream());
+        String hash = IpfsUtils.upload(sourceFile.getInputStream());
         return hash + "." + fileExtension;
     }
 
@@ -65,7 +65,7 @@ public class IpfsFileServiceImpl implements FileService {
         String fileExtension = split[1];
         String targetFileName = UUID.randomUUID().toString().replace("-", "") + "." + fileExtension;
         String targetFileFullPath = basePath + File.separator + modules + File.separator + dateFolder + File.separator + targetFileName;
-        IpfsUtil.download(hash, targetFileFullPath);
+        IpfsUtils.download(hash, targetFileFullPath);
         String url = fileUrl + modules + "/" + dateFolder + "/" + targetFileName;
         return url;
     }
@@ -86,7 +86,7 @@ public class IpfsFileServiceImpl implements FileService {
         //文件扩展名
         String fileExtension = split[1];
 
-        byte[] data = IpfsUtil.download(hash);
+        byte[] data = IpfsUtils.download(hash);
         return data;
     }
 

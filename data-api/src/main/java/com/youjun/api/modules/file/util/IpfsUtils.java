@@ -22,7 +22,7 @@ import java.io.InputStream;
 /**
  * ipfs 工具类
  */
-public class IpfsUtil {
+public class IpfsUtils {
 
     private static final String IPFS_API = "/ip4/39.100.38.142/tcp/8090";
 

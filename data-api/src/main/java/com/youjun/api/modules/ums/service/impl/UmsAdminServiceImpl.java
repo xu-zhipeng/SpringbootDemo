@@ -21,7 +21,7 @@ import com.youjun.api.modules.ums.service.UmsAdminCacheService;
 import com.youjun.api.modules.ums.service.UmsAdminRoleRelationService;
 import com.youjun.api.modules.ums.service.UmsAdminService;
 import com.youjun.common.exception.Asserts;
-import com.youjun.security.util.JwtTokenUtil;
+import com.youjun.security.util.JwtTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -57,7 +57,7 @@ import java.util.List;
 public class UmsAdminServiceImpl extends ServiceImpl<UmsAdminMapper, UmsAdmin> implements UmsAdminService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UmsAdminServiceImpl.class);
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenUtils jwtTokenUtils;
     @Autowired
     private Producer producer;
     @Autowired
@@ -141,7 +141,7 @@ public class UmsAdminServiceImpl extends ServiceImpl<UmsAdminMapper, UmsAdmin> i
             }
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            token = jwtTokenUtil.generateToken(userDetails);
+            token = jwtTokenUtils.generateToken(userDetails);
 //            updateLoginTimeByUsername(username);
             insertLoginLog(username);
         } catch (AuthenticationException e) {
@@ -179,7 +179,7 @@ public class UmsAdminServiceImpl extends ServiceImpl<UmsAdminMapper, UmsAdmin> i
 
     @Override
     public String refreshToken(String oldToken) {
-        return jwtTokenUtil.refreshHeadToken(oldToken);
+        return jwtTokenUtils.refreshHeadToken(oldToken);
     }
 
     @Override
