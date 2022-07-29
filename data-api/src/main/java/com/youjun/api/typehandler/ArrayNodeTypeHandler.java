@@ -1,10 +1,10 @@
 package com.youjun.api.typehandler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.apache.ibatis.type.BaseTypeHandler;
@@ -26,9 +26,9 @@ import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_
  * @author kirk
  * @since 2021/5/20
  */
-@MappedTypes({JsonNode.class})
-public class JsonNodeTypeHandler extends BaseTypeHandler<JsonNode> {
-    private static final Logger log = LoggerFactory.getLogger(JsonNodeTypeHandler.class);
+@MappedTypes({ArrayNode.class})
+public class ArrayNodeTypeHandler extends BaseTypeHandler<ArrayNode> {
+    private static final Logger log = LoggerFactory.getLogger(ArrayNodeTypeHandler.class);
 
     private static final PGobject jsonObject = new PGobject();
     private static final ObjectMapper objectMapper;
@@ -42,87 +42,86 @@ public class JsonNodeTypeHandler extends BaseTypeHandler<JsonNode> {
     }
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, JsonNode jsonNode, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(PreparedStatement ps, int i, ArrayNode arrayNode, JdbcType jdbcType) throws SQLException {
         if (ps != null) {
             try {
                 jsonObject.setType("jsonb");
-                jsonObject.setValue(objectMapper.writeValueAsString(jsonNode));
+                jsonObject.setValue(objectMapper.writeValueAsString(arrayNode));
                 ps.setObject(i, jsonObject, Types.OTHER);
             } catch (JsonProcessingException e) {
-                log.error("JsonbTypeHandler set error");
-                e.printStackTrace();
+                log.error("ArrayNodeTypeHandler set error",e);
                 ps.setNull(i, Types.OTHER);
             }
         }
     }
 
     @Override
-    public JsonNode getNullableResult(ResultSet rs, String columnName) throws SQLException {
+    public ArrayNode getNullableResult(ResultSet rs, String columnName) throws SQLException {
         Object o = rs.getObject(columnName);
         if (o == null) {
-            return objectMapper.createObjectNode();
+            return objectMapper.createArrayNode();
         } else {
             if (o instanceof PGobject && ((PGobject) o).getValue() != null) {
                 try {
-                    return objectMapper.readValue(((PGobject) o).getValue(),  JsonNode.class);
+                    return objectMapper.readValue(((PGobject) o).getValue(),  ArrayNode.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             } else if (o instanceof String) {
                 try {
-                    return objectMapper.readValue((String) o,  JsonNode.class);
+                    return objectMapper.readValue((String) o,  ArrayNode.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         }
-        return objectMapper.createObjectNode();
+        return objectMapper.createArrayNode();
     }
 
     @Override
-    public JsonNode getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+    public ArrayNode getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         Object o = rs.getObject(columnIndex);
         if (o == null) {
-            return objectMapper.createObjectNode();
+            return objectMapper.createArrayNode();
         } else {
             if (o instanceof PGobject && ((PGobject) o).getValue() != null) {
                 try {
-                    return objectMapper.readValue(((PGobject) o).getValue(), JsonNode.class);
+                    return objectMapper.readValue(((PGobject) o).getValue(), ArrayNode.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             } else if (o instanceof String) {
                 try {
-                    return objectMapper.readValue((String) o, JsonNode.class);
+                    return objectMapper.readValue((String) o, ArrayNode.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         }
-        return objectMapper.createObjectNode();
+        return objectMapper.createArrayNode();
     }
 
     @Override
-    public JsonNode getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public ArrayNode getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         Object o = cs.getObject(columnIndex);
         if (o == null) {
-            return objectMapper.createObjectNode();
+            return objectMapper.createArrayNode();
         } else {
             if (o instanceof PGobject && ((PGobject) o).getValue() != null) {
                 try {
-                    return objectMapper.readValue(((PGobject) o).getValue(),  JsonNode.class);
+                    return objectMapper.readValue(((PGobject) o).getValue(),  ArrayNode.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             } else if (o instanceof String) {
                 try {
-                    return objectMapper.readValue((String) o,  JsonNode.class);
+                    return objectMapper.readValue((String) o,  ArrayNode.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         }
-        return objectMapper.createObjectNode();
+        return objectMapper.createArrayNode();
     }
 
 }
