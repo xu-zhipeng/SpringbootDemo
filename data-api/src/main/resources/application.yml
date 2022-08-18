@@ -76,7 +76,7 @@ redis:
     common: 86400 # 24小时
 
 secure:
-  ignored:
+  ignore:
     urls: #安全路径白名单
       - /swagger-ui/index.html
       - /swagger-ui/**
