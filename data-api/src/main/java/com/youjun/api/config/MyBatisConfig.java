@@ -1,7 +1,6 @@
 package com.youjun.api.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
@@ -49,14 +48,17 @@ public class MyBatisConfig {
         /**
          * 分页
          */
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
         return interceptor;
     }
 
-    @Bean
-    public ConfigurationCustomizer configurationCustomizer() {
-        return configuration -> configuration.setUseDeprecatedExecutor(false);
-    }
+    /**
+     * 分页失效问题，新版本已经修复该功能不需要配置了
+     */
+    //@Bean
+    //public ConfigurationCustomizer configurationCustomizer() {
+    //    return configuration -> configuration.setUseDeprecatedExecutor(false);
+    //}
 
     /**
      * 自动填充功能

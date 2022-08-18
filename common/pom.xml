@@ -16,6 +16,11 @@
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!--redis依赖配置-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

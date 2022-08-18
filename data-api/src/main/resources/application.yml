@@ -11,8 +11,8 @@ spring:
     charset: UTF-8
     location: classpath:banner.txt
   #全局懒加载 解决循环依赖，不建议这种方式，建议用@Lazy注解
-  main:
-    lazy-initialization: true
+#  main:
+#    lazy-initialization: true
   #MQ消息队列
   rabbitmq:
     # 消息确认（ACK）
@@ -100,6 +100,7 @@ secure:
 #      - /**/**  #测试 开放所有端口
 
 aliyun:
+  enabled: false
   oss:
     endpoint: oss-cn-hangzhou.aliyuncs.com # oss对外服务的访问域名
     accessKeyId: LTAI5tEM9Cdu6TyqZgtvTLFx # 访问身份验证中用到用户标识

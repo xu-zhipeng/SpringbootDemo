@@ -17,7 +17,7 @@ import org.springframework.context.annotation.ComponentScans;
 @SpringBootApplication
 @ComponentScans(value = {
         @ComponentScan("com.youjun.common"),
-//        @ComponentScan("com.youjun.security"),
+        @ComponentScan("com.youjun.security"),
 })
 public class DataApiApplication {
     public static void main(String[] args) {

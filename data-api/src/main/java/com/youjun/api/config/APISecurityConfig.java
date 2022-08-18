@@ -4,7 +4,6 @@ import com.youjun.api.modules.ums.model.UmsResource;
 import com.youjun.api.modules.ums.service.UmsAdminService;
 import com.youjun.api.modules.ums.service.UmsResourceService;
 import com.youjun.security.component.DynamicSecurityService;
-import com.youjun.security.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class APISecurityConfig extends SecurityConfig {
+public class APISecurityConfig {
 
     @Autowired
     private UmsAdminService adminService;
