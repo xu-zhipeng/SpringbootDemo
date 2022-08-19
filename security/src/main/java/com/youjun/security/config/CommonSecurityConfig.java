@@ -24,11 +24,6 @@ public class CommonSecurityConfig {
     }
 
     @Bean
-    public IgnoreUrlsConfig ignoreUrlsConfig() {
-        return new IgnoreUrlsConfig();
-    }
-
-    @Bean
     public JwtTokenUtils jwtTokenUtil() {
         return new JwtTokenUtils();
     }
