@@ -83,11 +83,11 @@ secure:
       - /swagger-resources/**
       - /swagger/**
       - /**/v3/api-docs
+      - /webjars/springfox-swagger-ui/**  #knife4j 需要改成  /webjars/**
       - /**/*.js
       - /**/*.css
       - /**/*.png
       - /**/*.ico
-      - /webjars/springfox-swagger-ui/**
       - /actuator/**
       - /druid/**
       - /admin/login

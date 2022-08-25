@@ -101,7 +101,7 @@ public abstract class BaseSwaggerConfig {
      * 原因：Springfox 假设 Spring MVC 的路径匹配策略是 ant-path-matcher，而 Spring Boot 2.6.x版本的默认匹配策略是 path-pattern-matcher，这就造成了上面的报错
      */
     @Bean
-    public static BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
+    public BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
         return new BeanPostProcessor() {
 
             @Override

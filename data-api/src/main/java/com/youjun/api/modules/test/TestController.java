@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -39,6 +41,8 @@ public class TestController {
         userDate.setTime2(LocalDateTime.now());
         userDate.setTime3(new Date());
         userDate.setTime4(new Date());
+        userDate.setTime5(LocalDate.now());
+        userDate.setTime6(LocalTime.now());
         return userDate;
     }
 
@@ -56,7 +60,9 @@ public class TestController {
                              @RequestParam(value = "time1",required = false)LocalDateTime time1,
                              @RequestParam(value = "time2",required = false)LocalDateTime time2,
                              @RequestParam(value = "time3",required = false)Date time3,
-                             @RequestParam(value = "time4",required = false)Date time4){
+                             @RequestParam(value = "time4",required = false)Date time4,
+                             @RequestParam(value = "time5",required = false)LocalDate time5,
+                             @RequestParam(value = "time6",required = false)LocalTime time6){
 
         UserDate userDate = new UserDate();
         userDate.setId(id);
@@ -65,6 +71,8 @@ public class TestController {
         userDate.setTime2(time2);
         userDate.setTime3(time3);
         userDate.setTime4(time4);
+        userDate.setTime5(time5);
+        userDate.setTime6(time6);
         return userDate;
     }
 
