@@ -1,5 +1,6 @@
 package com.youjun.common.config.xss;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.youjun.common.util.JsonUtils;
 import com.youjun.common.util.StringUtils;
 
@@ -12,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * ServletRequest包装类,对request做XSS过滤处理
@@ -76,19 +78,28 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        String str=getRequestBody(super.getInputStream());
-        Map<String,Object> map= JsonUtils.mapper.readValue(str,Map.class);
-        Map<String,Object> resultMap=new HashMap<>(map.size());
-        for(Map.Entry<String,Object> entry:map.entrySet()){
-            String key=entry.getKey();
-            Object val=entry.getValue();
-            if(val instanceof String){
-                resultMap.put(key,xssEncode(val.toString()));
-            }else{
-                resultMap.put(key,val);
-            }
+        String str = getRequestBody(super.getInputStream());
+        Map<String, Object> map = null;
+        try {
+            map = JsonUtils.mapper.readValue(str, Map.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
-        str= JsonUtils.mapper.writeValueAsString(resultMap);
+        if (Objects.nonNull(map)) {
+            Map<String, Object> resultMap = new HashMap<>(map.size());
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                String key = entry.getKey();
+                Object val = entry.getValue();
+                if (val instanceof String) {
+                    resultMap.put(key, xssEncode(val.toString()));
+                } else {
+                    resultMap.put(key, val);
+                }
+            }
+            str = JsonUtils.mapper.writeValueAsString(resultMap);
+        } else {
+            str = xssEncode(str);
+        }
         final ByteArrayInputStream bais = new ByteArrayInputStream(str.getBytes());
         return new ServletInputStream() {
             @Override
