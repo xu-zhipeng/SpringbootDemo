@@ -1,14 +1,12 @@
 package com.youjun.api.modules.file.util;
 
+import com.youjun.common.util.FileUtils;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * <p>
@@ -34,10 +32,8 @@ public class IpfsUtils {
      * @throws IOException
      */
     public static String upload(String filePathAndName) throws IOException {
-        IPFS ipfs = new IPFS(IPFS_API);
-        NamedStreamable.FileWrapper file = new NamedStreamable.FileWrapper(new File(filePathAndName));
-        MerkleNode addResult = ipfs.add(file).get(0);
-        return addResult.hash.toString();
+        FileInputStream inputStream = new FileInputStream(filePathAndName);
+        return upload(inputStream);
     }
 
     /**
@@ -48,10 +44,8 @@ public class IpfsUtils {
      * @throws IOException
      */
     public static String upload(File source) throws IOException {
-        IPFS ipfs = new IPFS(IPFS_API);
-        NamedStreamable.FileWrapper file = new NamedStreamable.FileWrapper(source);
-        MerkleNode addResult = ipfs.add(file).get(0);
-        return addResult.hash.toString();
+        FileInputStream inputStream = new FileInputStream(source);
+        return upload(inputStream);
     }
 
     /**
@@ -92,24 +86,8 @@ public class IpfsUtils {
      * @throws IOException
      */
     public static void download(String hash, String filePathAndName) throws IOException {
-        //added QmRJAL6RDH2hYaUN2CdKdS2JGJ4Sn1KzxpTcyG94Y59vXL test.txt
-        //added Qmf1TC2ThF2QPTXSzTUq185sTyLKtMyQKxGmRzzYSjM2Ca a.png
-        IPFS ipfs = new IPFS(IPFS_API);
-        Multihash multihash = Multihash.fromBase58(hash);
         //下载文件
-        byte[] data = ipfs.cat(multihash);
-        if (data != null) {
-            File file = new File(filePathAndName);
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            if (file.exists()) {
-                file.delete();
-            }
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(data, 0, data.length);
-            fos.flush();
-            fos.close();
-        }
+        byte[] data = download(hash);
+        FileUtils.writeBytes(data,filePathAndName);
     }
 }

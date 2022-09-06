@@ -65,7 +65,7 @@ public class FileController {
      */
     @RequestMapping("/uploadLocal")
     public CommonResult uploadLocal(@RequestParam("file") MultipartFile file) {
-        String url = fileService.uploadLocal(null, file);
+        String url = fileService.uploadFile(null, file);
         if (StringUtils.hasText(url)) {
             return CommonResult.success((Object) url);
         }

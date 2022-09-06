@@ -1,12 +1,12 @@
 package com.youjun.common.util;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,40 +15,27 @@ import java.util.Map;
 import java.util.Objects;
 
 public class JsonUtils {
+    private static final Logger log = LoggerFactory.getLogger(JsonUtils.class);
+
     private JsonUtils() {
     }
 
-    public static class SerializationException extends RuntimeException{
+    public static class SerializationException extends RuntimeException {
         SerializationException(String message) {
             super(message);
         }
 
-        SerializationException(Exception e){
+        SerializationException(Exception e) {
             super(e);
         }
     }
 
     public static final ObjectMapper mapper;
 
-    static class MapNullValueSerializer extends StdSerializer<Object> {
-        public MapNullValueSerializer(){
-            this(null);
-        }
-
-        public MapNullValueSerializer(Class<Object> t){
-            super(t);
-        }
-
-        @Override
-        public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            gen.writeNull();
-        }
-    }
-
     static {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule()).registerModule(new ParameterNamesModule());
-        mapper.getSerializerProvider().setNullValueSerializer(new MapNullValueSerializer());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     }
@@ -57,7 +44,7 @@ public class JsonUtils {
         try {
             return mapper.writeValueAsString(o);
         } catch (JsonProcessingException e) {
-            throw new SerializationException(e);
+            throw new SerializationException(String.format("Failed to serialize: [%s]", o.toString()));
         }
     }
 
@@ -74,19 +61,20 @@ public class JsonUtils {
         return resultMap;
     }
 
-    public static <T> T fromJson(String content,Class<T> valueType ) throws SerializationException {
-        try{
+    public static <T> T fromJson(String content, Class<T> valueType) throws SerializationException {
+        try {
             return mapper.readValue(content, valueType);
-        }catch (IOException e){
-            throw new SerializationException(String.format("Failed to decode: [%s]", content));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new SerializationException(String.format("Failed to Deserialize: [%s]", content));
         }
     }
 
-    public static <T> T fromJson(String content, TypeReference<T> valueTypeRef ) throws SerializationException {
-        try{
+    public static <T> T fromJson(String content, TypeReference<T> valueTypeRef) throws SerializationException {
+        try {
             return mapper.readValue(content, valueTypeRef);
-        }catch (IOException e){
-            throw new SerializationException(String.format("Failed to decode: [%s]", content));
+        } catch (IOException e) {
+            throw new SerializationException(String.format("Failed to Deserialize: [%s]", content));
         }
     }
 
@@ -97,11 +85,12 @@ public class JsonUtils {
             try {
                 resultMap = mapper.readValue(context, type);
             } catch (IOException e) {
-                throw new SerializationException(String.format("Failed to decode: [%s]", context));
+                throw new SerializationException(String.format("Failed to Deserialize: [%s]", context));
             }
         }
         return resultMap;
     }
+
     public static LinkedHashMap<String, Object> fromJsonNodeToLinkedHashMap(JsonNode jsonNode) throws SerializationException {
         LinkedHashMap<String, Object> resultMap = null;
         if (Objects.nonNull(jsonNode)) {
@@ -113,6 +102,7 @@ public class JsonUtils {
 
     /**
      * 深拷贝
+     *
      * @param clazz
      * @param source
      * @param <T>
@@ -120,11 +110,11 @@ public class JsonUtils {
      * @throws SerializationException
      */
     public static <T> T copyProperties(Class<T> clazz, Object source) throws SerializationException {
-        String context=toJson(source);
-        try{
+        String context = toJson(source);
+        try {
             return mapper.readValue(context, clazz);
-        }catch (IOException e){
-            throw new SerializationException(String.format("Failed to decode: [%s]", context));
+        } catch (IOException e) {
+            throw new SerializationException(String.format("Failed to Deserialize: [%s]", context));
         }
     }
 

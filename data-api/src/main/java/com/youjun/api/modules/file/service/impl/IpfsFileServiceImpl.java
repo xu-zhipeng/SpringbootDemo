@@ -93,12 +93,12 @@ public class IpfsFileServiceImpl implements FileService {
     /**
      * 上传图片到服务器本地路径 并返回访问路径
      *
-     * @param modules
+     * @param dirPrefix
      * @param sourceFile
      * @return
      */
     @Override
-    public String uploadLocal(String modules, MultipartFile sourceFile) {
+    public String uploadFile(String dirPrefix, MultipartFile sourceFile) {
         throw new RuntimeException("This method is not implemented");
     }
 }

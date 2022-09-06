@@ -42,13 +42,13 @@ public interface FileService {
     public byte[] download2Byte(String hashAndFileExtension) throws IOException;
 
     /**
-     * 上传图片到服务器本地路径 并返回访问路径
+     * 上传图片 指定路径前缀 并返回访问路径
      *
-     * @param modules
-     * @param sourceFile
+     * @param dirPrefix 文件路径前缀
+     * @param sourceFile 上传文件
      * @return
      */
-    public String uploadLocal(String modules, MultipartFile sourceFile);
+    public String uploadFile(String dirPrefix, MultipartFile sourceFile);
 
 
 }

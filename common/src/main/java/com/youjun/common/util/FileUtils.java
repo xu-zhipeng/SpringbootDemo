@@ -102,9 +102,13 @@ public class FileUtils {
     }
 
     public static String readString(String path, Charset charset) {
+       return readString(new File(path),charset);
+    }
+
+    public static String readString(File file, Charset charset) {
         StringBuilder stringBuilder = new StringBuilder();
         try (
-                FileInputStream in = new FileInputStream(path);
+                FileInputStream in = new FileInputStream(file);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, charset));
         ) {
             String str = null;
@@ -128,25 +132,18 @@ public class FileUtils {
     }
 
     public static byte[] readBytes(File file) {
-        try (
-                BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ) {
-            byte[] bytes = new byte[1024];
-            int len = -1;
-            while ((len = in.read(bytes)) != -1) {
-                out.write(bytes, 0, len);
-            }
-            return out.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("FileUtils readBytes error");
+        try {
+            FileInputStream inputStream = new FileInputStream(file);
+            return readBytes(inputStream);
+        } catch (FileNotFoundException e) {
+            log.error("文件错误");
+            throw new RuntimeException("文件错误: " + e.getMessage());
         }
-        return new byte[]{};
     }
 
-    public static byte[] readBytes(InputStream in) {
+    public static byte[] readBytes(InputStream inputStream) {
         try (
+                BufferedInputStream in = new BufferedInputStream(inputStream);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
         ) {
             if (Objects.isNull(in)) {
@@ -158,7 +155,6 @@ public class FileUtils {
             while ((len = in.read(bytes)) != -1) {
                 out.write(bytes, 0, len);
             }
-            in.close();
             return out.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
@@ -167,8 +163,16 @@ public class FileUtils {
         return new byte[]{};
     }
 
+    public static File writeBytes(InputStream in, String path) {
+        return writeBytes(readBytes(in), createFile(path));
+    }
+
     public static File writeBytes(byte[] bytes, String path) {
         return writeBytes(bytes, createFile(path));
+    }
+
+    public static File writeBytes(InputStream in, File file) {
+        return writeBytes(readBytes(in), file);
     }
 
     public static File writeBytes(byte[] bytes, File file) {
@@ -176,35 +180,10 @@ public class FileUtils {
                 BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
         ) {
             if (Objects.isNull(file) || file.isDirectory()) {
-                log.error("file is null or directorty.");
-                throw new RuntimeException("file is null or directorty.");
+                log.error("file is null or directory.");
+                throw new RuntimeException("file is null or directory.");
             }
             bos.write(bytes);
-            bos.flush();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-        }
-        return file;
-    }
-
-    public static File writeBytes(InputStream in, String path) {
-        return writeBytes(in, createFile(path));
-    }
-
-    public static File writeBytes(InputStream in, File file) {
-        try (
-                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-        ) {
-            if (Objects.isNull(in)) {
-                log.error("inputStream is null.");
-                throw new RuntimeException("inputStream is null.");
-            }
-            if (Objects.isNull(file) || file.isDirectory()) {
-                log.error("file is null or directorty.");
-                throw new RuntimeException("file is null or directorty.");
-            }
-            bos.write(readBytes(in));
             bos.flush();
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -220,9 +199,9 @@ public class FileUtils {
         ) {
             outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("找不到文件" + e.getMessage());
+            throw new RuntimeException("找不到文件: " + e.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException("IO问题" + e.getMessage());
+            throw new RuntimeException("IO问题: " + e.getMessage());
         }
     }
 }
