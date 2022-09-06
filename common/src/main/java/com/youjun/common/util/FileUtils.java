@@ -102,7 +102,7 @@ public class FileUtils {
     }
 
     public static String readString(String path, Charset charset) {
-       return readString(new File(path),charset);
+        return readString(new File(path), charset);
     }
 
     public static String readString(File file, Charset charset) {
@@ -203,5 +203,13 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException("IO问题: " + e.getMessage());
         }
+    }
+
+    public static String getFileExtension(String fileName) {
+        String[] split = fileName.split("\\.");
+        if (split.length >= 2) {
+            return split[split.length - 1];
+        }
+        throw new RuntimeException("filename invalid: " + fileName);
     }
 }

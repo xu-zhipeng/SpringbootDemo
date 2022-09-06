@@ -13,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * <p>
  *
@@ -57,6 +55,6 @@ class OssServiceTest {
 
     @Test
     void getFileUrl() {
-        String fileUrl = ossService.getFileUrl("https://kirk-hz-dev.oss-cn-hangzhou.aliyuncs.com/spring-boot-demo/test/a.txt");
+        String fileUrl = ossService.accessUrl("https://kirk-hz-dev.oss-cn-hangzhou.aliyuncs.com/spring-boot-demo/test/a.txt");
     }
 }

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -106,7 +105,7 @@ public class OssServiceImpl implements OssService {
     }
 
     @Override
-    public String upload(FileInputStream inputStream, String filePath) {
+    public String upload(InputStream inputStream, String filePath) {
         filePath = ALIYUN_OSS_DIR_PREFIX.concat(filePath);
         String fileUrl = this.convertToFileUrl(filePath);
         //创建PutObjectRequest对象
@@ -117,7 +116,7 @@ public class OssServiceImpl implements OssService {
     }
 
     @Override
-    public String getFileUrl(String fileUrl) {
+    public String accessUrl(String fileUrl) {
         String filePath = this.convertToFilePath(fileUrl);
         boolean exists = ossClient.doesObjectExist(ALIYUN_OSS_BUCKET_NAME, filePath);
         if (exists) {

@@ -5,7 +5,6 @@ import com.youjun.api.modules.file.dto.OssCallbackResult;
 import com.youjun.api.modules.file.dto.OssPolicyResult;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public interface OssService {
      * @param filePath    Oss路径 + 文件名
      * @return 文件访问地址url
      */
-    String upload(FileInputStream inputStream, String filePath);
+    String upload(InputStream inputStream, String filePath);
 
     /**
      * 获取访问Url
@@ -40,10 +39,10 @@ public interface OssService {
      * @param fileUrl
      * @return 返回访问url
      * 例如：
-     *   公共读：https://kirk-hz-dev.oss-cn-hangzhou.aliyuncs.com/spring-boot-demo/test/a.txt
+     *   公共读(也有一大串参数，但是可有可无)：https://kirk-hz-dev.oss-cn-hangzhou.aliyuncs.com/spring-boot-demo/test/a.txt?Expires=1662453669&OSSAccessKeyId=TMP.3KgxPThycqhdbAQCUaaoGCPJBuvHXAEZTtzbUYdr73rxy25H3JHGcKzg7fuqbAh4xRpLuk3qjg85HgA8rLyavXU3XgJhFw&Signature=xi4T3vdZDKGX4WalMDo3kt8SAk8%3D
      *   临时访问url：https://kirk-hz-dev.oss-cn-hangzhou.aliyuncs.com/spring-boot-demo/test/a.txt?Expires=1662453669&OSSAccessKeyId=TMP.3KgxPThycqhdbAQCUaaoGCPJBuvHXAEZTtzbUYdr73rxy25H3JHGcKzg7fuqbAh4xRpLuk3qjg85HgA8rLyavXU3XgJhFw&Signature=xi4T3vdZDKGX4WalMDo3kt8SAk8%3D
      */
-    String getFileUrl(String fileUrl);
+    String accessUrl(String fileUrl);
 
     /**
      * oss下载文件

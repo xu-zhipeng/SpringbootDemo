@@ -24,13 +24,13 @@ public interface FileService {
     public String uploadFile(MultipartFile sourceFile) throws IOException;
 
     /**
-     * 获取文件
+     * 获取文件 url
      *
      * @param hashAndFileExtension
      * @return
      * @throws IOException
      */
-    public String downloadFile(String hashAndFileExtension) throws IOException;
+    public String getFileUrl(String hashAndFileExtension) throws IOException;
 
     /**
      * 获取文件字节流

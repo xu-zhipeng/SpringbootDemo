@@ -72,10 +72,10 @@ public class FileController {
         return CommonResult.failed();
     }
 
-    @RequestMapping("/download")
-    public CommonResult download(@RequestParam("hash") String hashAndFileExtension) {
+    @RequestMapping("/getUrl")
+    public CommonResult getUrl(@RequestParam("hash") String hashAndFileExtension) {
         try {
-            String url = fileService.downloadFile(hashAndFileExtension);
+            String url = fileService.getFileUrl(hashAndFileExtension);
             return CommonResult.success((Object) url);
         } catch (IOException e) {
             e.printStackTrace();

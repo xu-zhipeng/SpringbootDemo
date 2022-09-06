@@ -54,7 +54,7 @@ public class IpfsFileServiceImpl implements FileService {
      * @throws IOException
      */
     @Override
-    public String downloadFile(String hashAndFileExtension) throws IOException {
+    public String getFileUrl(String hashAndFileExtension) throws IOException {
         //创建临时文件夹，根据时间每天一个
         String modules = "temp";
         String dateFolder = LocalDate.now().toString();

@@ -51,7 +51,7 @@ public class LocalFileServiceImpl implements FileService {
      * @throws IOException
      */
     @Override
-    public String downloadFile(String hashAndFileExtension) throws IOException {
+    public String getFileUrl(String hashAndFileExtension) throws IOException {
         throw new RuntimeException("This method is not implemented");
     }
 
