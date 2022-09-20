@@ -51,10 +51,10 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public String[] getParameterValues(String name) {
         String[] values = super.getParameterValues(name);
-        if(values != null) {
+        if (values != null) {
             int length = values.length;
             String[] escapseValues = new String[length];
-            for(int i = 0; i < length; i++){
+            for (int i = 0; i < length; i++) {
                 escapseValues[i] = xssEncode(values[i]);
             }
             return escapseValues;
@@ -63,10 +63,10 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public Map<String,String[]> getParameterMap() {
-        Map<String,String[]> map = new LinkedHashMap<>();
-        Map<String,String[]> parameters = super.getParameterMap();
-        for (Map.Entry<String,String[]> entry : parameters.entrySet()) {
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> map = new LinkedHashMap<>();
+        Map<String, String[]> parameters = super.getParameterMap();
+        for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
             String[] values = entry.getValue();
             for (int i = 0; i < values.length; i++) {
                 values[i] = xssEncode(values[i]);
@@ -83,7 +83,8 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         try {
             map = JsonUtils.mapper.readValue(str, Map.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            //单纯一个字符串 没有key
+            str = xssEncode(str);
         }
         if (Objects.nonNull(map)) {
             Map<String, Object> resultMap = new HashMap<>(map.size());
@@ -97,8 +98,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
                 }
             }
             str = JsonUtils.mapper.writeValueAsString(resultMap);
-        } else {
-            str = xssEncode(str);
         }
         final ByteArrayInputStream bais = new ByteArrayInputStream(str.getBytes());
         return new ServletInputStream() {
@@ -123,14 +122,11 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     private String getRequestBody(InputStream stream) {
         String line = "";
         StringBuilder body = new StringBuilder();
-        int counter = 0;
-
         // 读取POST提交的数据内容
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         try {
             while ((line = reader.readLine()) != null) {
                 body.append(line);
-                counter++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -140,11 +136,12 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      * 不用common.lang3 StringEscapeUtils.escapeHtml4方法的话，可以用 xssEncode方法进行过滤
+     *
      * @param input
      * @return
      */
     private String xssEncode(String input) {
-        if(StringUtils.isBlank(input)){
+        if (StringUtils.isBlank(input)) {
             return input;
         }
         return htmlFilter.filter(input);

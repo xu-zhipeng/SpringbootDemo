@@ -83,7 +83,7 @@ public class WebSocketServer {
         if (StringUtils.isNotBlank(message)) {
             try {
                 //传送给对应toUserId用户的websocket
-                sendToAll(String.format(userId.toString(), message));
+                sendToAll(String.format("收到来自: %s 的消息, %s", userId, message));
             } catch (Exception e) {
                 e.printStackTrace();
             }

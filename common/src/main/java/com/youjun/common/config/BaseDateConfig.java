@@ -134,9 +134,9 @@ public class BaseDateConfig {
             TimeZone tz = TimeZone.getTimeZone("UTC");
             DateFormat df = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
             df.setTimeZone(tz);
-            builder.failOnEmptyBeans(false)
-                    .failOnUnknownProperties(false)
+            builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                     .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    .featuresToDisable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
                     .featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                     //设置 Date格式
                     .dateFormat(df);
