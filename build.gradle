@@ -71,13 +71,13 @@ subprojects {
         securityVersion = '1.0-SNAPSHOT'
     }
 
-    configurations {
+    /* configurations {
         all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         all*.exclude group: 'log4j', module: 'log4j'
         compileOnly {
-            extendsFrom
+            extendsFrom annotationProcessor
         }
-    }
+    } */
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
@@ -103,10 +103,11 @@ subprojects {
         implementation "org.springframework.boot:spring-boot-starter-websocket"
         implementation "org.springframework.boot:spring-boot-configuration-processor"
         testImplementation "org.springframework.boot:spring-boot-starter-test"
-        implementation "org.projectlombok:lombok:1.18.12"
         implementation "com.google.code.gson:gson:${gsonVersion}"
         implementation "com.google.guava:guava:${guavaVersion}"
         implementation "cn.hutool:hutool-all:${hutoolVersion}"
+        compileOnly "org.projectlombok:lombok"
+        annotationProcessor "org.projectlombok:lombok"
     }
 
     // 我们生成的自定义 maven-bom
