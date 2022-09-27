@@ -66,7 +66,7 @@ public class JsonUtils {
         mapper.setDateFormat(df);
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         //LocalDateTime系列序列化和反序列化模块，继承自jsr310，我们在这里修改了日期格式
         JavaTimeModule javaTimeModule = new JavaTimeModule();
