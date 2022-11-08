@@ -235,6 +235,10 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <!-- 将本地引入jar 打包进去 -->
+                        <includeSystemScope>true</includeSystemScope>
+                    </configuration>
                 </plugin>
                 <!-- 这个配置 需要本地有docker环境,默认https传输,http 需要配置 {"insecure-registries" : ["1.117.230.132:5000"]}-->
                 <plugin>

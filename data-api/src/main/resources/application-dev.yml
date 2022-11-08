@@ -90,8 +90,8 @@ spring:
     host: localhost
     port: 5672
     virtual-host: /
-    username: admin
-    password: admin
+    username: kirk
+    password: kirk
 
   quartz:
     # quartz db schema
