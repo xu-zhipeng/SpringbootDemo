@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.youjun.common.service.RedisService;
 import com.youjun.common.service.impl.RedisServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +52,9 @@ public class BaseRedisConfig {
         //springboot 2.2.10 版本 jackson 2.10.5 目前 objectMapper.getPolymorphicTypeValidator() 等价于 LaissezFaireSubTypeValidator.instance
         //objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+        //LocalDateTime系列序列化和反序列化模块，继承自jsr310
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        objectMapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule());
         serializer.setObjectMapper(objectMapper);
         return serializer;
     }
