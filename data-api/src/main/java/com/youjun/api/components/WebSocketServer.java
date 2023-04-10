@@ -1,7 +1,7 @@
 package com.youjun.api.components;
 
-import com.youjun.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -21,7 +21,7 @@ public class WebSocketServer {
     /**
      * 客户端ID
      */
-    private Long userId = 0L;
+    private String userId = "0";
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
@@ -35,18 +35,19 @@ public class WebSocketServer {
     /**
      * 用来存储当前在线的客户端(此map线程安全)
      */
-    private static ConcurrentHashMap<Long, WebSocketServer> webSocketMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, WebSocketServer> webSocketMap = new ConcurrentHashMap<>();
 
     /**
      * 连接建立成功后调用
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "id") Long id) throws IOException {
+    public void onOpen(Session session, @PathParam(value = "id") String id) throws IOException {
         this.session = session;
         // 接收到发送消息的客户端ID
         this.userId = id;
         if (webSocketMap.containsKey(userId)) {
-            webSocketMap.remove(userId);
+            WebSocketServer remove = webSocketMap.remove(userId);
+            remove.close();
             webSocketMap.put(userId, this);
             //加入set中
         } else {
@@ -64,7 +65,8 @@ public class WebSocketServer {
     @OnClose
     public void onClose() {
         if (webSocketMap.containsKey(userId)) {
-            webSocketMap.remove(userId);
+            WebSocketServer remove = webSocketMap.remove(userId);
+            remove.close();
             //从set中删除
             subOnlineCount();
         }
@@ -83,7 +85,7 @@ public class WebSocketServer {
         if (StringUtils.isNotBlank(message)) {
             try {
                 //传送给对应toUserId用户的websocket
-                sendToAll(String.format("收到来自: %s 的消息, %s", userId, message));
+                sendToAll(String.format(userId.toString(), message));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -105,18 +107,19 @@ public class WebSocketServer {
      * 推送信息给指定ID客户端，如客户端不在线，则返回不在线信息给自己
      *
      * @param message      客户端发来的消息
-     * @param sendClientId 客户端ID
+     * @param sendClientId 设备标识+用户ID
      */
-    public void sendToUser(String message, Long sendClientId) {
+    public boolean sendToUser(String message, String sendClientId) {
         try {
             if (webSocketMap.get(sendClientId) != null) {
                 webSocketMap.get(sendClientId).sendMessage(message);
-            } else {
-                log.error("客户端{}不存在", sendClientId);
+                log.debug("sendToUser：{}",message);
+                return true;
             }
         } catch (Exception e) {
             log.error("推送消息到指定客户端出错", e);
         }
+        return false;
     }
 
     /**
@@ -126,9 +129,10 @@ public class WebSocketServer {
      */
     public void sendToAll(String message) {
         try {
-            for (Long key : webSocketMap.keySet()) {
+            for (String key : webSocketMap.keySet()) {
                 webSocketMap.get(key).sendMessage(message);
             }
+            log.debug("sendToAll：{}",message);
         } catch (Exception e) {
             log.error("推送消息到所有客户端出错", e);
         }
@@ -142,6 +146,14 @@ public class WebSocketServer {
      */
     private void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
+    }
+
+    private void close() {
+        try {
+            this.session.close();
+        } catch (IOException e) {
+            log.error("session 关闭失败");
+        }
     }
 
     private static Integer getOnlineCount() {
