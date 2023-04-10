@@ -18,7 +18,7 @@ import java.util.Map;
 //@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CommonResult<T> {
     private Boolean success;
-    private Long errorCode;
+    private String errorCode;
     private String errorMessage;
     private T data;
     /**
@@ -30,14 +30,14 @@ public class CommonResult<T> {
     protected CommonResult() {
     }
 
-    protected CommonResult(Boolean success, Long errorCode, String errorMessage, T data) {
+    protected CommonResult(Boolean success, String errorCode, String errorMessage, T data) {
         this.success = success;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
         this.data = data;
     }
 
-    protected CommonResult(Boolean success, Long errorCode, String errorMessage, T data, Map<String, Object> attachments) {
+    protected CommonResult(Boolean success, String errorCode, String errorMessage, T data, Map<String, Object> attachments) {
         this.success = success;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
@@ -145,11 +145,11 @@ public class CommonResult<T> {
         this.success = success;
     }
 
-    public long getErrorCode() {
+    public String getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(long errorCode) {
+    public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
 

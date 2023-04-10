@@ -7,7 +7,7 @@ import java.io.Serializable;
  * Created on 2019/4/19.
  */
 public interface IErrorCode extends Serializable {
-    long getCode();
+    String getCode();
 
     String getMessage();
 }
