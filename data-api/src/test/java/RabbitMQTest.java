@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.youjun.api.DataApiApplication;
 import com.youjun.api.modules.office.controller.dto.BctDataDTO;
 import com.youjun.common.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.HashMap;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = DataApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RabbitMQTest {
     @Autowired
     private AmqpTemplate amqpTemplate;
@@ -50,7 +51,6 @@ public class RabbitMQTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("test", 11);
         map.put("name", "job");
-        JsonUtils.toJson(map);
         amqpTemplate.convertAndSend("SWAP_REGULATION_QUEUE", map);
         System.out.println("消息发送完毕！");
     }
