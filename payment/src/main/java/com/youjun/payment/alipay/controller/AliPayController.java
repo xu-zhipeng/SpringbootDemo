@@ -6,11 +6,12 @@
  */
 package com.youjun.payment.alipay.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.youjun.payment.alipay.config.AlipayConfig;
-import com.youjun.payment.alipay.vo.TradeVo;
 import com.youjun.payment.alipay.service.AlipayConfigService;
 import com.youjun.payment.alipay.utils.AliPayStatusEnum;
 import com.youjun.payment.alipay.utils.AlipayUtils;
+import com.youjun.payment.alipay.vo.TradeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,9 @@ public class AliPayController {
 
     @GetMapping
     public ResponseEntity<AlipayConfig> get() {
-        return new ResponseEntity<>(alipayService.find(), HttpStatus.OK);
+        AlipayConfig alipayConfig = new AlipayConfig();
+        BeanUtil.copyProperties(alipayService.find(), alipayConfig);
+        return new ResponseEntity<>(alipayConfig, HttpStatus.OK);
     }
 
     //@Log("配置支付宝")
@@ -75,6 +78,15 @@ public class AliPayController {
         AlipayConfig alipay = alipayService.find();
         trade.setOutTradeNo(alipayUtils.getOrderCode());
         String payUrl = alipayService.toPayAsWeb(alipay, trade);
+        return ResponseEntity.ok(payUrl);
+    }
+
+    @ApiOperation("手机App支付")
+    @PostMapping(value = "/toPayAsApp")
+    public ResponseEntity<String> toPayAsApp(@Validated @RequestBody TradeVo trade) throws Exception {
+        AlipayConfig alipay = alipayService.find();
+        trade.setOutTradeNo(alipayUtils.getOrderCode());
+        String payUrl = alipayService.toPayAsApp(alipay, trade);
         return ResponseEntity.ok(payUrl);
     }
 

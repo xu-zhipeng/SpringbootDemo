@@ -6,11 +6,12 @@
  */
 package com.youjun.payment.alipay.config;
 
-import      cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author hupeng
@@ -19,6 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
 @Slf4j
+@Configuration
 @ConfigurationProperties(prefix = "pay.alipay")
 public class AlipayConfig {
 
