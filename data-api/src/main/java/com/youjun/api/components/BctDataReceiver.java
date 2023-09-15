@@ -3,8 +3,6 @@ package com.youjun.api.components;
 import com.rabbitmq.client.Channel;
 import com.youjun.common.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -21,7 +19,6 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class BctDataReceiver {
-    private static Logger log = LoggerFactory.getLogger(BctDataReceiver.class);
 
     @RabbitListener(bindings = {
             @QueueBinding(

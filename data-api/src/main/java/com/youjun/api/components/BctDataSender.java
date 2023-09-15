@@ -1,8 +1,6 @@
 package com.youjun.api.components;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RabbitListener(queues = "SWAP_REGULATION_QUEUE")
 public class BctDataSender {
-    private static Logger log = LoggerFactory.getLogger(BctDataSender.class);
     @Autowired
     private AmqpTemplate amqpTemplate;
 

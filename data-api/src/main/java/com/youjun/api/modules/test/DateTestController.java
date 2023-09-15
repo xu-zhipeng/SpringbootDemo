@@ -22,8 +22,8 @@ import java.util.Date;
 @Slf4j
 @RestController
 @Api(tags = "TestController", description = "测试Controller")
-@RequestMapping("/Test")
-public class TestController {
+@RequestMapping("/datetest")
+public class DateTestController {
 
     @ApiOperation(value = "测试method")
     @RequestMapping("/test")
