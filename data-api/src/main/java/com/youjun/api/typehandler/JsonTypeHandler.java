@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import com.youjun.common.util.StringUtils;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
@@ -29,7 +31,7 @@ import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_
  * @author kirk
  * @since 2021/5/20
  */
-@MappedTypes({JsonNode.class})
+@MappedTypes({JsonNode.class, ArrayNode.class})
 public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
     private static final Logger log = LoggerFactory.getLogger(JsonTypeHandler.class);
     private Class<T> clazz;
@@ -40,6 +42,7 @@ public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
         }
         this.clazz = clazz;
     }
+
     private static final ObjectMapper objectMapper;
 
     static {
@@ -71,6 +74,9 @@ public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
     }
 
     private T fromJson(String content, Class<T> valueType) {
+        if (StringUtils.isBlank(content)) {
+            return null;
+        }
         try {
             return objectMapper.readValue(content, valueType);
         } catch (IOException e) {
