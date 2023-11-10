@@ -19,14 +19,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * MyBatis配置类
+ * MyBatisPlus配置类
  * Created on 2019/4/8.
  */
 @Slf4j
 @Configuration
 @EnableTransactionManagement
 @MapperScan({"com.youjun.api.modules.*.mapper"})
-public class MyBatisConfig {
+public class MyBatisPlusConfig {
     /**
      * 分页
      * 新的分页插件,一缓和二缓遵循mybatis的规则,需要设置 MybatisConfiguration#useDeprecatedExecutor = false 避免缓存出现问题
@@ -62,8 +62,10 @@ public class MyBatisConfig {
 
     /**
      * 自动填充功能
-     * MetaObjectHandler提供的默认方法的策略均为:如果属性有值则不覆盖,如果填充值为null则不填充
-     * 注：如果修改时间不为null，那就必须手动做更新
+     * MetaObjectHandler提供的默认方法的策略均为:（严格模式）如果属性有值则不覆盖,如果提供的填充值为null则不填充
+     * 注：如果修改时间不为null，那就必须手动做更新,或者配置强制更新
+     * 使用下面写法：
+     * this.setFieldValByName("modifiedDt", LocalDateTime.now(), metaObject);
      *
      * @return
      */
@@ -90,8 +92,10 @@ public class MyBatisConfig {
                 // 起始版本 3.3.0(推荐)
                 //this.strictUpdateFill(metaObject, "modifiedDt", LocalDateTime.class, LocalDateTime.now());
                 // 或者 起始版本 3.3.3(推荐)
-                this.strictInsertFill(metaObject, "modifiedBy", this::getUserName, String.class);
+                this.strictUpdateFill(metaObject, "modifiedBy", this::getUserName, String.class);
                 this.strictUpdateFill(metaObject, "modifiedDt", () -> LocalDateTime.now(), LocalDateTime.class);
+                //配置强制更新(无论是否为null都会) modifiedDt字段
+                //this.setFieldValByName("modifiedDt", LocalDateTime.now(), metaObject);
                 // 或者 也可以使用(3.3.0 该方法有bug)
                 //this.fillStrategy(metaObject, "modifiedDt", LocalDateTime.now());
             }
