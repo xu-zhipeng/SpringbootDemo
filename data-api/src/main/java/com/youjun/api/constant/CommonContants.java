@@ -37,34 +37,4 @@ public class CommonContants {
     public final static String APP_IOS_TYPE = "ios";
     public final static String APP_WGTURL_KEY_PREFIX = "wgtUrl-";
     public final static String APP_WGT_OSS_FOLDER = "upgrade/";
-
-    /**
-     * 成功
-     */
-    public static final boolean SUCCESS_BOOL = true;
-    /**
-     * 失败
-     */
-    public static final boolean FAILED_BOOL = true;
-
-    /**
-     * 启用|禁用
-     */
-    public static final boolean ENABLE_BOOL = true;
-    public static final String ENABLE_STRING = "1";
-    public static final int ENABLE_INT = 1;
-
-    /**
-     * 禁用
-     */
-    public static final boolean DISABLE_BOOL = false;
-    public static final String DISABLE_STRING = "0";
-    public static final int DISABLE_INT = 0;
-
-    /**
-     * 常用数字 常量
-     */
-    public static final int ONE = 1;
-    public static final int TWO = 2;
-    public static final int THREE = 3;
 }
